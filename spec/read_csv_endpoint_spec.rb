@@ -1,9 +1,6 @@
 require_relative '../app/server.rb'
-require 'rack/test'
-require 'rspec'
 
 RSpec.describe 'Server' do
-  include Rack::Test::Methods
 
   def app
     Sinatra::Application
