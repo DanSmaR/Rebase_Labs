@@ -1,3 +1,5 @@
+ENV['RACK_ENV'] = 'test'
+
 require_relative '../app/server.rb'
 
 RSpec.describe 'Server' do
