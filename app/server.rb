@@ -1,4 +1,3 @@
-require 'rack/handler/puma'
 require 'sinatra'
 require 'csv'
 

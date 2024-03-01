@@ -6,9 +6,6 @@ GEM
     json (2.7.1)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
-    nio4r (2.7.0)
-    puma (6.4.2)
-      nio4r (~> 2.0)
     rack (3.0.9.1)
     rack-protection (4.0.0)
       base64 (>= 0.1.0)
@@ -49,7 +46,6 @@ PLATFORMS
 
 DEPENDENCIES
   json
-  puma
   rack
   rack-test
   rackup
