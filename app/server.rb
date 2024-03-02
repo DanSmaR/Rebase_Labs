@@ -3,6 +3,7 @@ require 'sinatra'
 require 'csv'
 
 get '/tests' do
+  content_type :json
   rows = CSV.read("data/data.csv", col_sep: ';')
 
   columns = rows.shift
