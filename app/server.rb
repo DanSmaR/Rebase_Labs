@@ -1,19 +1,25 @@
 require 'rack/handler/puma'
 require 'sinatra'
 require 'csv'
+require 'pg'
 
 get '/tests' do
   content_type :json
-  rows = CSV.read("data/data.csv", col_sep: ';')
 
-  columns = rows.shift
+end
 
-  rows.map do |row|
-    row.each_with_object({}).with_index do |(cell, hash), idx|
-      column = columns[idx]
-      hash[column] = cell
-    end
-  end.to_json
+conn = PG.connect(
+  host: 'db',
+  port: 5432,
+  dbname: 'postgres',
+  user: 'postgres',
+  password: 'password'
+)
+
+CSV.foreach("data/data.csv", headers: true, col_sep: ';') do |row|
+  puts '------'
+  puts row.inspect
+  puts '------'
 end
 
 unless ENV['RACK_ENV'] == 'test'
