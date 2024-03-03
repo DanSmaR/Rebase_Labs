@@ -10,7 +10,7 @@ services:
       timeout: 2s
       retries: 3
     networks:
-      - mynetwork
+      - rebase_labs_network
   app:
     build: .
     ports:
@@ -19,7 +19,7 @@ services:
       db:
         condition: service_healthy
     networks:
-      - mynetwork
+      - rebase_labs_network
 
 networks:
-  mynetwork:
+  rebase_labs_network:
