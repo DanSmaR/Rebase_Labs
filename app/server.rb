@@ -2,18 +2,20 @@ require 'rack/handler/puma'
 require 'sinatra'
 require 'csv'
 require 'pg'
+require 'uri'
 
 get '/tests' do
   content_type :json
-
 end
 
+uri = URI.parse(ENV['DATABASE_URL'])
+
 conn = PG.connect(
-  host: 'db',
-  port: 5432,
-  dbname: 'postgres',
-  user: 'postgres',
-  password: 'password'
+  host: uri.hostname,
+  port: uri.port,
+  dbname: uri.path[1..-1],
+  user: uri.user,
+  password: uri.password
 )
 
 CSV.foreach("data/data.csv", headers: true, col_sep: ';') do |row|
