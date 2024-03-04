@@ -1,19 +1,21 @@
 require 'rack/handler/puma'
 require 'sinatra'
-require 'csv'
+require_relative '../database/db_manager.rb'
 
 get '/tests' do
   content_type :json
-  rows = CSV.read("data/data.csv", col_sep: ';')
 
-  columns = rows.shift
+  result = DBManager.conn.exec(
+    "
+      SELECT p.*, d.*, e.*
+      FROM exams e
+      JOIN patients p ON p.cpf = e.patient_cpf
+      JOIN doctors d ON d.crm = e.doctor_crm
+    "
+  )
 
-  rows.map do |row|
-    row.each_with_object({}).with_index do |(cell, hash), idx|
-      column = columns[idx]
-      hash[column] = cell
-    end
-  end.to_json
+  json = result.map { |row| row }.to_json
+  json
 end
 
 unless ENV['RACK_ENV'] == 'test'

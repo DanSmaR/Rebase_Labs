@@ -1,0 +1,28 @@
+version: '3.4'
+services:
+  db:
+    image: postgres:16.2-alpine3.19
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=medical_exams
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 3
+    networks:
+      - rebase_labs_network
+  app:
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db:5432/medical_exams
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - rebase_labs_network
+
+networks:
+  rebase_labs_network:

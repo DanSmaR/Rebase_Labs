@@ -5,6 +5,7 @@ gem 'rack'
 gem 'rackup'
 gem 'puma'
 gem 'json'
+gem 'pg'
 
 group :test do
   gem 'rspec'
