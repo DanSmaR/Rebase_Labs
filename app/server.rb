@@ -1,27 +1,21 @@
 require 'rack/handler/puma'
 require 'sinatra'
-require 'csv'
-require 'pg'
-require 'uri'
+require_relative '../database/db_manager.rb'
 
 get '/tests' do
   content_type :json
-end
 
-uri = URI.parse(ENV['DATABASE_URL'])
+  result = DBManager.conn.exec(
+    "
+      SELECT p.*, d.*, e.*
+      FROM exams e
+      JOIN patients p ON p.cpf = e.patient_cpf
+      JOIN doctors d ON d.crm = e.doctor_crm
+    "
+  )
 
-conn = PG.connect(
-  host: uri.hostname,
-  port: uri.port,
-  dbname: uri.path[1..-1],
-  user: uri.user,
-  password: uri.password
-)
-
-CSV.foreach("data/data.csv", headers: true, col_sep: ';') do |row|
-  puts '------'
-  puts row.inspect
-  puts '------'
+  json = result.map { |row| row }.to_json
+  json
 end
 
 unless ENV['RACK_ENV'] == 'test'

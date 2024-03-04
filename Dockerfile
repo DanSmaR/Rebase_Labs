@@ -7,4 +7,4 @@ RUN bundle install
 
 COPY . .
 
-CMD [ "ruby", "app/server.rb" ]
+CMD ruby database/database_setup.rb ; ruby app/server.rb
