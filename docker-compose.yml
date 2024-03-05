@@ -2,6 +2,7 @@ version: '3.4'
 services:
   db:
     image: postgres:16.2-alpine3.19
+    container_name: medical_exams_db
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=medical_exams
@@ -10,10 +11,14 @@ services:
       interval: 2s
       timeout: 2s
       retries: 3
+    volumes:
+      - ~/docker_volumes/medical_exams_db:/var/lib/postrgresql/data
     networks:
-      - rebase_labs_network
+      - medical_exams_network
   app:
     build: .
+    image: medical_exams_api:tag
+    container_name: medical_exams_app
     ports:
       - 3000:3000
     environment:
@@ -21,8 +26,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - .:/usr/src/app
     networks:
-      - rebase_labs_network
+      - medical_exams_network
 
 networks:
-  rebase_labs_network:
+  medical_exams_network:
