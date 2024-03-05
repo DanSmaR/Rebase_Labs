@@ -67,7 +67,7 @@ To rebuild the application with Docker CLI only:
 bin/dev rebuild_docker
 ```
 
-The command `bin/dev start_compose` or `start_docker` will start two Docker containers: one for the PostgreSQL database and one for the Ruby/Sinastra API. The API will be available at `http://localhost:3000`.
+The command `bin/dev start_compose` or `bin/dev start_docker` will start two Docker containers: one for the PostgreSQL database and one for the Ruby/Sinastra API. The API will be available at `http://localhost:3000`.
 
 Firstly, the database will be created and be connected. 
 This message will be on the console for a while if you are using the `bin/dev start_compose` command:
