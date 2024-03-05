@@ -32,6 +32,11 @@ To run the API, follow these steps:
 2. Navigate to the project directory.
 3. Run the following commands:
 
+Change the permissions of bin/dev to make it executable
+```sh
+chmod +x bin/dev
+```
+
 To start the application with Docker Compose (Recommended), because it's easier to see the logs:
 ```sh
 bin/dev start_compose
