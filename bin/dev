@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Function to start the application with Docker Compose
+start_compose() {
+  mkdir -p ~/docker_volumes/medical_exams_db
+  docker compose up
+}
+
+# Function to start the application with Docker CLI only
+start_docker() {
+  mkdir -p ~/docker_volumes/medical_exams_db
+  docker network create medical_exams_network
+  docker run --rm --name medical_exams_db --network=medical_exams_network -v ~/docker_volumes/medical_exams_db:/var/lib/postgresql/data -e POSTGRES_PASSWORD=password -e POSTGRES_DB=medical_exams -p 5432:5432 -d postgres:16.2-alpine3.19
+  docker build -t medical_exams_api:tag .
+  docker run --rm --name medical_exams_app --network=medical_exams_network -v $(pwd):/usr/src/app -p 3000:3000 -e DATABASE_URL=postgres://postgres:password@medical_exams_db:5432/medical_exams -d medical_exams_api:tag
+}
+
+# Function to stop the application with Docker CLI only
+stop_docker() {
+  docker stop medical_exams_app medical_exams_db
+  docker network rm medical_exams_network
+  docker image prune -f
+}
+
+# Function to stop the application with Docker Compose
+stop_compose() {
+  docker compose down
+  docker image prune -f
+}
+
+# Function to rebuild the application with Docker Compose
+rebuild_compose() {
+  stop
+  docker rmi medical_exams_api:tag
+  start_compose
+}
+
+# Function to rebuild the application with Docker CLI only
+rebuild_docker() {
+  stop_docker
+  docker rmi medical_exams_api:tag
+  start_docker
+}
+
+case $1 in
+    start_compose)
+        start_compose
+        ;;
+    start_docker)
+        start_docker
+        ;;
+    stop_docker)
+        stop_docker
+        ;;
+    stop_compose)
+        stop_compose
+        ;;
+    rebuild_compose)
+        rebuild_compose
+        ;;
+    rebuild_docker)
+        rebuild_docker
+        ;;
+    *)
+        echo "Usage: bin/dev {start_compose|start_docker|stop_compose|stop_docker|rebuild_compose|rebuild_docker}"
+        ;;
+esac

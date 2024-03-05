@@ -10,27 +10,82 @@ Before you begin, ensure you have met the following requirements:
 
 ## Running the API
 
+Be sure to not having a postgresql service running on your machine in port 5432. You can check it by typing the following command:
+```sh
+sudo lsof -i :5432
+```
+
+If yes, it will show you the process id of the service.
+```sh
+COMMAND    PID     USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+postgres 14087 postgres    3u  IPv4 126791      0t0  TCP localhost:postgresql (LISTEN)
+```
+
+Type the following command to stop it:
+```sh
+sudo systemctl stop postgresql
+```
+
 To run the API, follow these steps:
 
 1. Clone this repository.
 2. Navigate to the project directory.
-3. Run the following command:
+3. Run the following commands:
+
+To start the application with Docker Compose (Recommended), because it's easier to see the logs:
+```sh
+bin/dev start_compose
+```
+
+Or to start the application with Docker CLI only:
 
 ```sh
-docker compose up
+bin/dev start_docker
 ```
-This command will start two Docker containers: one for the PostgreSQL database and one for the Ruby/Sinastra API. The API will be available at `http://localhost:3000`.
+
+To stop the application with Docker CLI only:
+
+```sh
+bin/dev stop_docker
+```
+
+To stop the application with Docker Compose:
+
+```sh
+bin/dev stop_compose
+```
+
+To rebuild the application with Docker Compose:
+
+```sh
+bin/dev rebuild_compose
+```
+
+To rebuild the application with Docker CLI only:
+
+```sh
+bin/dev rebuild_docker
+```
+
+The command `bin/dev start_compose` or `start_docker` will start two Docker containers: one for the PostgreSQL database and one for the Ruby/Sinastra API. The API will be available at `http://localhost:3000`.
 
 Firstly, the database will be created and be connected. 
-This message will be on the console for a while:
+This message will be on the console for a while if you are using the `bin/dev start_compose` command:
 
 ```sh
 db-1   | 2024-03-04 17:02:25.373 UTC [36] LOG:  database system is ready to accept connections
 ```
 
+if you are using the `bin/dev start_docker` command, to see the message above, you need to run logs command:
+
+```sh 
+docker logs medical_exams_db
+```
+
 After this, the database will be seeded with some data.
 
-Then, the API will be started. In the console, you will see the API logs. You will be granted access to the API once you see this message:
+Then, the API will be started. In the console, you will see the API logs. You will be granted access to the API once you see this message. It could take a while to see it:
+
 ```sh
 Puma starting in single mode...
 app-1  | * Puma version: 6.4.2 (ruby 3.2.3-p157) ("The Eagle of Durango")
@@ -42,16 +97,50 @@ app-1  | * Listening on http://0.0.0.0:3000
 app-1  | Use Ctrl-C to stop
 ```
 
+If you are not using compose, to see this log message, you can run the following command:
+
+```sh
+docker logs medical_exams_app
+```
+
+## View containers information
+
+To view the containers information, run:
+
+```sh
+docker ps
+```
 
 ## Accessing the Containers
 
 To access the Ruby API container, run:
 
 ```sh
-docker exec -it <container_id> bash
+docker exec -it medical_exams_app bash
+```
+Replace `<container_id>` with the ID of the Ruby API container. You can get the container ID by running `docker ps`.
+
+## Accessing the Database
+
+To access the PostgreSQL database, run:
+
+```sh
+docker exec -it medical_exams_db psql -U postgres
 ```
 
-Replace `<container_id>` with the ID of the Ruby API container. You can get the container ID by running `docker ps`.
+## View container logs
+
+To view the logs of the containers, run:
+
+```sh
+docker logs <container_name>
+```
+
+if you started the containers with `bin/dev start_compose`, you can use the following command to view the logs of the containers:
+
+```sh
+docker compose logs
+```
 
 ## Running the Tests
 
