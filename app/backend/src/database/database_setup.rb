@@ -56,34 +56,35 @@ DBManager.conn.prepare("insert_exam", "
   VALUES ($1, $2, $3, $4, $5, $6, $7)
 ")
 
-CSV.foreach('src/data/data.csv', headers: true, col_sep: ';') do |row|
+DBManager.conn.transaction do
+  CSV.foreach('src/data/data.csv', headers: true, col_sep: ';') do |row|
+    DBManager.conn.exec_prepared("insert_patient", [
+        row['cpf'],
+        row['nome paciente'],
+        row['email paciente'],
+        row['data nascimento paciente'],
+        row['endereço/rua paciente'],
+        row['cidade paciente'],
+        row['estado patiente']
+    ]);
 
-  DBManager.conn.exec_prepared("insert_patient", [
+    DBManager.conn.exec_prepared("insert_doctor", [
+      row['crm médico'],
+      row['crm médico estado'],
+      row['nome médico'],
+      row['email médico']
+    ]);
+
+    DBManager.conn.exec_prepared("insert_exam", [
       row['cpf'],
-      row['nome paciente'],
-      row['email paciente'],
-      row['data nascimento paciente'],
-      row['endereço/rua paciente'],
-      row['cidade paciente'],
-      row['estado patiente']
-  ]);
-
-  DBManager.conn.exec_prepared("insert_doctor", [
-    row['crm médico'],
-    row['crm médico estado'],
-    row['nome médico'],
-    row['email médico']
-  ]);
-
-  DBManager.conn.exec_prepared("insert_exam", [
-    row['cpf'],
-    row['crm médico'],
-    row['token resultado exame'],
-    row['data exame'],
-    row['tipo exame'],
-    row['limites tipo exame'],
-    row['resultado tipo exame']
-  ]);
+      row['crm médico'],
+      row['token resultado exame'],
+      row['data exame'],
+      row['tipo exame'],
+      row['limites tipo exame'],
+      row['resultado tipo exame']
+    ]);
+  end
 end
 
 puts 'Done'
