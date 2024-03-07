@@ -57,9 +57,10 @@ fetch(URL)
           
       tableBody.appendChild(tableRow);
 
-      table.appendChild(tableBody);
-
+      
     });
+    
+    table.appendChild(tableBody);
     
     fragment.appendChild(heading1);
     fragment.appendChild(table);
