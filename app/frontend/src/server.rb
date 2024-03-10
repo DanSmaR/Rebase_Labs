@@ -1,9 +1,18 @@
 require 'rack/handler/puma'
 require 'sinatra'
+require 'faraday'
 
 get '/' do
-  content_type 'text/html'
-  File.open('src/index.html')
+  erb :index
+end
+
+get '/data' do
+  content_type :json
+  conn = Faraday.new(
+    url: 'http://localhost:3001',
+    headers: {'Accept' => 'application/json'}
+  )
+  response = conn.get('/tests')
 end
 
 

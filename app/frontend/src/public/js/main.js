@@ -1,5 +1,5 @@
 const fragment = new DocumentFragment();
-const URL = 'http://localhost:3001/tests'
+const URL = 'http://localhost:3000/data'
 
 fetch(URL)
   .then((response) => response.json())
