@@ -32,7 +32,6 @@ RSpec.describe 'User visits search page', type: :feature, js: true do
 
     using_wait_time(10) do
       visit '/search'
-      save_and_open_page
 
       expect(page).to have_current_path('/search')
       expect(page).to have_content('Busca de Exames por Token')

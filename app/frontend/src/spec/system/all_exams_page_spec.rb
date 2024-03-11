@@ -51,7 +51,6 @@ RSpec.describe 'User visits exams page', type: :feature, js: true do
 
     using_wait_time(10) do
       visit '/exams'
-      save_and_open_page
 
       expect(page).to have_current_path('/exams')
       expect(page).to have_content('CPF')
