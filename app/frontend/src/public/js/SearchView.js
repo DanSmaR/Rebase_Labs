@@ -21,6 +21,14 @@ export default class extends AbstractView {
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
+      
+      app = document.querySelector("#app");
+      
+      const oldTable = document.querySelector('table');
+
+      if (oldTable) {
+        app.removeChild(oldTable);
+      }
 
       const token = document.getElementById('token').value;
 
@@ -29,8 +37,8 @@ export default class extends AbstractView {
           .then((response) => response.json())
           .then((data) => {
             const table = this.createTable(data);
-  
-            document.querySelector("#app").appendChild(table);
+            
+            app.appendChild(table);
           });
       }
     });
