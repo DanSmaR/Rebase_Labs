@@ -22,7 +22,7 @@ stop() {
 
 # Function to rebuild the application with Docker Compose
 rebuild() {
-  stop
+  down
   mkdir -p ~/docker_volumes/medical_exams_db
   cd app && docker compose up --build && cd ..
 }
