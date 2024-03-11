@@ -8,7 +8,7 @@ Before you begin, ensure you have met the following requirements:
 
 - You have installed the latest version of [Docker](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/).
 
-## Running the API
+## Running the Application
 
 Be sure to not having a postgresql service running on your machine in port 5432. You can check it by typing the following command:
 ```sh
