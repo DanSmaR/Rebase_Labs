@@ -50,9 +50,7 @@ RSpec.describe 'User visits home page', type: :feature, js: true do
     allow(conn).to receive(:get).with('tests').and_return(double(body: db_result.to_json))
 
     using_wait_time(10) do
-      visit '/'
-      click_link 'Exames'
-
+      visit '/exams'
       save_and_open_page
 
       expect(page).to have_current_path('/exams')

@@ -1,9 +1,16 @@
 require 'rack/handler/puma'
 require 'sinatra'
 require 'faraday'
-require 'json'
 
 get '/' do
+  erb :index
+end
+
+get '/exams' do
+  erb :index
+end
+
+get '/search' do
   erb :index
 end
 
