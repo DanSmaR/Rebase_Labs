@@ -1,5 +1,6 @@
 import ExamsView from "./ExamsView.js";
 import HomeView from "./HomeView.js";
+import SearchView from "./SearchView.js";
 
 const navigateTo = url => {
   history.pushState(null, null, url);
@@ -10,6 +11,7 @@ const router = () => {
   const routes = [
     { path: "/", view: HomeView },
     { path: "/exams", view: ExamsView },
+    { path: "/search", view: SearchView },
   ];
 
   const routesMatches = routes.map(route => {

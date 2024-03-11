@@ -18,7 +18,7 @@ require 'capybara/rspec'
 require 'selenium-webdriver'
 
 ENV['RACK_ENV'] = 'test'
-require_relative '../server.rb' # replace with the path to your Sinatra application file
+require_relative '../server.rb'
 
 Capybara.app = Sinatra::Application
 
@@ -29,7 +29,7 @@ Capybara.register_driver :selenium do |app|
 end
 
 Capybara.javascript_driver = :selenium
-Capybara.default_max_wait_time = 15
+# Capybara.default_max_wait_time = 2
 
 
 RSpec.configure do |config|
