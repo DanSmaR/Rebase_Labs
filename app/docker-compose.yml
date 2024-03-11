@@ -1,0 +1,51 @@
+version: '3.4'
+services:
+  db:
+    image: postgres:16.2-alpine3.19
+    container_name: medical_exams_db
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=medical_exams
+    restart: 'always'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ~/docker_volumes/medical_exams_db:/var/lib/postrgresql/data
+    networks:
+      - backend
+  backend:
+    build: ./backend
+    image: medical_exams_api:tag
+    container_name: medical_exams_backend
+    ports:
+      - 3001:3001
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db:5432/medical_exams
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/usr/src/app/backend/src
+    networks:
+      - frontend
+      - backend
+  frontend:
+    build: ./frontend
+    image: medical_exams_client:tag
+    container_name: medical_exams_frontend
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/usr/src/app/frontend/src
+    networks:
+      - frontend
+    command: ["./wait-for-it.sh", "--strict", "--timeout=60", "backend:3001", "--", "ruby", "src/server.rb"]
+
+networks:
+  frontend:
+  backend:

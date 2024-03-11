@@ -1,6 +1,6 @@
 ENV['RACK_ENV'] = 'test'
 
-require_relative '../app/server.rb'
+require_relative '../server.rb'
 require 'json'
 
 RSpec.describe 'Server' do
@@ -10,7 +10,6 @@ RSpec.describe 'Server' do
 
   describe 'GET /tests' do
     it 'returns the exams data' do
-      # Mock the database connection and query result
       db_result = [
         {
           cpf: "048.973.170-88",
