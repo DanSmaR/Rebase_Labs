@@ -1,6 +1,6 @@
-# Medical Exams API
+# Medical Exams App
 
-This is a Ruby API that provides access to medical exams data. It uses Sinatra as the web framework and PostgreSQL as the database, all installed inside docker containers.
+This is a Ruby application that provides access to medical exams data. It uses Sinatra as the web framework and PostgreSQL as the database, all installed inside docker containers.
 
 ## Prerequisites
 
@@ -8,7 +8,7 @@ Before you begin, ensure you have met the following requirements:
 
 - You have installed the latest version of [Docker](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/).
 
-## Running the API
+## Running the Application
 
 Be sure to not having a postgresql service running on your machine in port 5432. You can check it by typing the following command:
 ```sh
@@ -37,54 +37,30 @@ Change the permissions of bin/dev to make it executable
 chmod +x bin/dev
 ```
 
-To start the application with Docker Compose (Recommended), because it's easier to see the logs:
+To start the application with Docker Compose (Recommended), because it's easier to see the logs and the container are created in order to function properly:
 ```sh
-bin/dev start_compose
-```
-
-Or to start the application with Docker CLI only:
-
-```sh
-bin/dev start_docker
-```
-
-To stop the application with Docker CLI only:
-
-```sh
-bin/dev stop_docker
+bin/dev start
 ```
 
 To stop the application with Docker Compose:
 
 ```sh
-bin/dev stop_compose
+bin/dev stop
 ```
 
 To rebuild the application with Docker Compose:
 
 ```sh
-bin/dev rebuild_compose
+bin/dev rebuild
 ```
 
-To rebuild the application with Docker CLI only:
-
-```sh
-bin/dev rebuild_docker
-```
-
-The command `bin/dev start_compose` or `bin/dev start_docker` will start two Docker containers: one for the PostgreSQL database and one for the Ruby/Sinastra API. The API will be available at `http://localhost:3000`.
+The command `bin/dev start` will start three (3) Docker containers: one for the PostgreSQL database, one for the Ruby/Sinastra API and one for the frontend Ruby/Sinastra App. The API will be available at `http://localhost:3001/tests` in your local machine. Inside the containers, the API will be available at `http://backend:3001/tests`.
 
 Firstly, the database will be created and be connected. 
-This message will be on the console for a while if you are using the `bin/dev start_compose` command:
+This message will be on the console for a while if you are using the `bin/dev start` command:
 
 ```sh
 db-1   | 2024-03-04 17:02:25.373 UTC [36] LOG:  database system is ready to accept connections
-```
-
-if you are using the `bin/dev start_docker` command, to see the message above, you need to run logs command:
-
-```sh 
-docker logs medical_exams_db
 ```
 
 After this, the database will be seeded with some data.
@@ -98,14 +74,24 @@ app-1  | *  Min threads: 0
 app-1  | *  Max threads: 5
 app-1  | *  Environment: development
 app-1  | *          PID: 8
-app-1  | * Listening on http://0.0.0.0:3000
+app-1  | * Listening on http://0.0.0.0:3001
 app-1  | Use Ctrl-C to stop
 ```
 
-If you are not using compose, to see this log message, you can run the following command:
+## Accessing the Frontend App
+
+To access the frontend app, open your browser and navigate to `http://localhost:3000/` after this log appears in the console:
 
 ```sh
-docker logs medical_exams_app
+medical_exams_frontend  | wait-for-it.sh: backend:3001 is available after 2 seconds
+medical_exams_frontend  | Puma starting in single mode...
+medical_exams_frontend  | * Puma version: 6.4.2 (ruby 3.2.3-p157) ("The Eagle of Durango")
+medical_exams_frontend  | *  Min threads: 0
+medical_exams_frontend  | *  Max threads: 5
+medical_exams_frontend  | *  Environment: development
+medical_exams_frontend  | *          PID: 1
+medical_exams_frontend  | * Listening on http://0.0.0.0:3000
+medical_exams_frontend  | Use Ctrl-C to stop
 ```
 
 ## View containers information
@@ -118,19 +104,24 @@ docker ps
 
 ## Accessing the Containers
 
-To access the Ruby API container, run:
+To access the API backend container, run:
 
 ```sh
-docker exec -it medical_exams_app bash
+docker exec -it medical_exams_backend bash
 ```
-Replace `<container_id>` with the ID of the Ruby API container. You can get the container ID by running `docker ps`.
+
+To access the App frontend container, run:
+
+```sh
+docker exec -it medical_exams_frontend bash
+```
 
 ## Accessing the Database
 
 To access the PostgreSQL database, run:
 
 ```sh
-docker exec -it medical_exams_db psql -U postgres
+docker exec -it medical_exams_db psql -U postgres -d medical_exams
 ```
 
 ## View container logs
@@ -141,18 +132,18 @@ To view the logs of the containers, run:
 docker logs <container_name>
 ```
 
-if you started the containers with `bin/dev start_compose`, you can use the following command to view the logs of the containers:
+if you started the containers with `bin/dev start`, you can use the following command to view the logs of the containers:
 
 ```sh
-docker compose logs
+bin/dev logs
 ```
 
 ## Running the Tests
 
-To run the tests, you need to access the Ruby API container as described above. Then, run:
+To run the tests, you need to access the specific containers as described above. Then, run:
 
 ```sh
-bundle exec rspec
+cd src && bundle exec rspec
 ```
 
 ## Making Requests to the /tests Endpoint
@@ -160,7 +151,7 @@ bundle exec rspec
 You can make GET requests to the `/tests` endpoint to retrieve medical exams data. Here's an example using curl:
 
 ```sh
-curl http://localhost:3000/tests
+curl http://localhost:3001/tests
 ```
 
 This will return a JSON array with the medical exams data.
