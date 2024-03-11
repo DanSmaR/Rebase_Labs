@@ -1,14 +1,13 @@
-ENV['RACK_ENV'] = 'test'
-
-require_relative '../server.rb'
+require_relative '../spec_helper.rb'
 require 'json'
+require 'faraday'
 
 RSpec.describe 'Server' do
   def app
     Sinatra::Application
   end
 
-  describe 'GET /tests' do
+  describe 'GET /data' do
     it 'returns the exams data' do
       db_result = [
         {
@@ -51,16 +50,11 @@ RSpec.describe 'Server' do
         }
       ]
 
-      query = <<~SQL.gsub("\n", " ")
-        SELECT p.*, d.*, e.*
-        FROM exams e
-        JOIN patients p ON p.cpf = e.patient_cpf
-        JOIN doctors d ON d.crm = e.doctor_crm
-      SQL
+      conn = instance_double(Faraday::Connection)
+      allow(Faraday).to receive(:new).and_return(conn)
+      allow(conn).to receive(:get).with('tests').and_return(double(body: db_result.to_json))
 
-      allow(DBManager.conn).to receive(:exec_params).with(query, []).and_return(db_result)
-
-      response = get '/tests'
+      response = get '/data'
 
       data = JSON.parse(response.body)
 
@@ -89,21 +83,13 @@ RSpec.describe 'Server' do
             exam_type: "hemácias",
             exam_limits: "45-52",
             exam_result: "97"
-          },
+          }
         ]
+        conn = instance_double(Faraday::Connection)
+        allow(Faraday).to receive(:new).and_return(conn)
+        allow(conn).to receive(:get).with("tests", {:token=>"IQCZ17"}).and_return(double(body: db_result.to_json))
 
-        query = <<~SQL.gsub("\n", " ")
-          SELECT p.*, d.*, e.*
-          FROM exams e
-          JOIN patients p ON p.cpf = e.patient_cpf
-          JOIN doctors d ON d.crm = e.doctor_crm
-        SQL
-        query += "\nWHERE e.token = $1"
-        query.gsub("\n", " ")
-
-        allow(DBManager.conn).to receive(:exec_params).with(query, ["IQCZ17"]).and_return(db_result)
-
-        response = get '/tests?token=IQCZ17'
+        response = get '/data?token=IQCZ17'
 
         data = JSON.parse(response.body)
 
