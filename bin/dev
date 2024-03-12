@@ -1,12 +1,10 @@
 #!/bin/bash
 
-# Function to start the application with Docker Compose
 up() {
   mkdir -p ~/docker_volumes/medical_exams_db
   cd app && docker compose up && cd ..
 }
 
-# Function to stop the application with Docker Compose
 down() {
   cd app && docker compose down && cd ..
   docker system prune -f --volumes
@@ -20,7 +18,6 @@ stop() {
   cd app && docker compose stop && cd ..
 }
 
-# Function to rebuild the application with Docker Compose
 rebuild() {
   down
   mkdir -p ~/docker_volumes/medical_exams_db
