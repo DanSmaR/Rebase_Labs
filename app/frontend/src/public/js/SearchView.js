@@ -37,7 +37,6 @@ export default class extends AbstractView {
           .then((response) => response.json())
           .then((data) => {
             const table = this.createTable(data);
-            
             app.appendChild(table);
           });
       }

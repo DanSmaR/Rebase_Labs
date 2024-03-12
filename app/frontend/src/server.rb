@@ -22,7 +22,7 @@ get '/data' do
   end
 
   if params[:token]
-    response = conn.get('tests', token: params[:token])
+    response = conn.get("tests/#{params[:token]}")
   else
     response = conn.get('tests')
   end

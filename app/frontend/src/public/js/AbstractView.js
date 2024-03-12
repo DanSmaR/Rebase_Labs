@@ -9,12 +9,14 @@ export default class {
       document.title = title;
   }
 
-  createTable(data) {
+  createTable(exams) {
     const tableHTML = `
       <caption>Tabela com informações detalhadas sobre todos os exames médicos efetuados</caption>
       
       <thead>
         <tr>
+          <td>Token</td>
+          <td>Data do Exame</td>
           <td>CPF</td>
           <td>Nome</td>
           <td>E-mail</td>
@@ -22,10 +24,10 @@ export default class {
           <td>Endereço</td>
           <td>Cidade</td>
           <td>Estado</td>
+          <td>Nome do Médico</td>
+          <td>E-mail do Médico</td>
           <td>CRM do Médico</td>
           <td>CRM Estado</td>
-          <td>Token</td>
-          <td>Data do Exame</td>
           <td>Tipo de Exame</td>
           <td>Limites</td>
           <td>Resultado</td>
@@ -36,25 +38,35 @@ export default class {
     table.innerHTML = tableHTML;
     const tableBody = document.createElement('tbody');
 
-    data.forEach(exam => {
-      const tableRow = document.createElement('tr');
-      tableRow.innerHTML = `
-        <td>${exam.cpf}</td>
-        <td>${exam.name}</td>
-        <td>${exam.email}</td>
-        <td>${exam.birth_date}</td>
-        <td>${exam.address}</td>
-        <td>${exam.city}</td>
-        <td>${exam.state}</td>
-        <td>${exam.crm}</td>
-        <td>${exam.crm_state}</td>
-        <td>${exam.token}</td>
-        <td>${exam.exam_date}</td>
-        <td>${exam.exam_type}</td>
-        <td>${exam.exam_limits}</td>
-        <td>${exam.exam_result}</td>
-      `;
-      tableBody.appendChild(tableRow);
+    exams.forEach(exam => {
+      const patientRow = document.createElement('tr');
+        patientRow.innerHTML = `
+          <td>${exam.token}</td>
+          <td>${exam.exam_date}</td>
+          <td>${exam.cpf}</td>
+          <td>${exam.name}</td>
+          <td>${exam.email}</td>
+          <td>${exam.birthday}</td>
+          <td>${exam.address}</td>
+          <td>${exam.city}</td>
+          <td>${exam.state}</td>
+          <td>${exam.doctor.name}</td>
+          <td>${exam.doctor.email}</td>
+          <td>${exam.doctor.crm}</td>
+          <td>${exam.doctor.crm_state}</td>
+        `;
+        tableBody.appendChild(patientRow);
+
+        exam.tests.forEach(test => {
+          const examRow = document.createElement('tr');
+          examRow.innerHTML = `
+            <td colspan="13"></td>
+            <td>${test.type}</td>
+            <td>${test.limits}</td>
+            <td>${test.result}</td>
+          `;
+          tableBody.appendChild(examRow);
+        });
     });
 
     table.appendChild(tableBody);

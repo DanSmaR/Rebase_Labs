@@ -6,8 +6,8 @@ puts 'Creating the tables ...'
 DBManager.conn.exec("
   CREATE TABLE IF NOT EXISTS patients (
     cpf VARCHAR PRIMARY KEY,
-    name VARCHAR,
-    email VARCHAR,
+    patient_name VARCHAR,
+    patient_email VARCHAR,
     birth_date DATE,
     address VARCHAR,
     city VARCHAR,
@@ -19,8 +19,8 @@ DBManager.conn.exec("
   CREATE TABLE IF NOT EXISTS doctors (
     crm VARCHAR PRIMARY KEY,
     crm_state VARCHAR,
-    name VARCHAR,
-    email VARCHAR
+    doctor_name VARCHAR,
+    doctor_email VARCHAR
   )
 ")
 
@@ -40,13 +40,13 @@ DBManager.conn.exec("
 puts 'Populating the tables with data...'
 
 DBManager.conn.prepare("insert_patient", "
-  INSERT INTO patients (cpf, name, email, birth_date, address, city, state)
+  INSERT INTO patients (cpf, patient_name, patient_email, birth_date, address, city, state)
   VALUES ($1, $2, $3, $4, $5, $6, $7)
   ON CONFLICT (cpf) DO NOTHING
 ")
 
 DBManager.conn.prepare("insert_doctor", "
-  INSERT INTO doctors (crm, crm_state, name, email)
+  INSERT INTO doctors (crm, crm_state, doctor_name, doctor_email)
   VALUES ($1, $2, $3, $4)
   ON CONFLICT (crm) DO NOTHING
 ")
