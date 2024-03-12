@@ -7,4 +7,4 @@ RUN bundle install
 
 COPY . .
 
-CMD ruby src/database/database_setup.rb ; ruby src/server.rb
+CMD ruby -e "require './src/database/database_setup.rb'; DatabaseSetup.seed"; ruby src/server.rb
