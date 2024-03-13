@@ -10,7 +10,10 @@ RSpec.describe 'Server' do
   end
 
   describe 'POST /import' do
+    let(:mock_conn) { double('PG::Connection') }
+
     before do
+      allow(DBManager).to receive(:conn).and_return(mock_conn)
       allow(DatabaseSetup).to receive(:prepare_statements)
       allow(DatabaseSetup).to receive(:insert_csv_data)
     end
