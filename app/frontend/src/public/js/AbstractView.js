@@ -1,5 +1,5 @@
 export default class {
-  URL = window.APP_URL || 'http://localhost:3000/data';
+  URL = '/data';
 
   setTitle(title) {
       document.title = title;

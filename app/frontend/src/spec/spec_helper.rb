@@ -31,11 +31,14 @@ end
 Capybara.javascript_driver = :selenium
 # Capybara.default_max_wait_time = 2
 
-Capybara.app_host = "http://localhost:#{Capybara.current_session.server.port}"
+Capybara.app = Sinatra::Application
+Capybara.run_server = true
+Capybara.server_port = 9292
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods
   config.include Capybara::DSL
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
