@@ -58,6 +58,7 @@ RSpec.describe 'Server' do
 
       data = JSON.parse(response.body)
 
+      expect(response.status).to eq 200
       expect(data).to be_instance_of Array
       expect(data).to eq(JSON.parse(db_result.to_json))
     end
@@ -87,12 +88,13 @@ RSpec.describe 'Server' do
         ]
         conn = instance_double(Faraday::Connection)
         allow(Faraday).to receive(:new).and_return(conn)
-        allow(conn).to receive(:get).with("tests", {:token=>"IQCZ17"}).and_return(double(body: db_result.to_json))
+        allow(conn).to receive(:get).with("tests/IQCZ17").and_return(double(body: db_result.to_json))
 
         response = get '/data?token=IQCZ17'
 
         data = JSON.parse(response.body)
 
+        expect(response.status).to eq 200
         expect(data).to be_instance_of Array
         expect(data).to eq(JSON.parse(db_result.to_json))
       end
