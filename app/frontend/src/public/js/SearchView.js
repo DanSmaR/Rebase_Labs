@@ -1,8 +1,8 @@
 import AbstractView from "./AbstractView.js";
 
 export default class extends AbstractView {
-  constructor(params) {
-    super(params);
+  constructor() {
+    super();
     this.setTitle("Busca de Exames por Token");
   }
 

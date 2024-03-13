@@ -31,6 +31,7 @@ end
 Capybara.javascript_driver = :selenium
 # Capybara.default_max_wait_time = 2
 
+Capybara.app_host = "http://localhost:#{Capybara.current_session.server.port}"
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods
