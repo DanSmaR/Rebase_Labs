@@ -6,6 +6,7 @@ gem 'rackup'
 gem 'puma'
 gem 'json'
 gem 'pg'
+gem 'sidekiq'
 
 group :test do
   gem 'rspec'
