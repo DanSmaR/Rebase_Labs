@@ -19,6 +19,10 @@ require 'rspec'
 ENV['RACK_ENV'] = 'test'
 require_relative '../server.rb'
 
+def app
+  Sinatra::Application
+end
+
 RSpec.configure do |config|
   config.include Rack::Test::Methods
   # rspec-expectations config goes here. You can use an alternate

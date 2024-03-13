@@ -1,12 +1,8 @@
 require 'json'
-require_relative './spec_helper.rb'
-require_relative './support/test_data.rb'
+require_relative '../spec_helper.rb'
+require_relative '../support/test_data.rb'
 
 RSpec.describe 'Server' do
-  def app
-    Sinatra::Application
-  end
-
   describe 'GET /tests' do
     let(:mock_conn) { double('PG::Connection') }
 

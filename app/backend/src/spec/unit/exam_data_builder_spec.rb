@@ -1,5 +1,5 @@
-require_relative './spec_helper.rb'
-require_relative '../exam_data_builder.rb'
+require_relative '../spec_helper.rb'
+require_relative '../../exam_data_builder.rb'
 
 RSpec.describe ExamDataBuilder do
   let(:items) do

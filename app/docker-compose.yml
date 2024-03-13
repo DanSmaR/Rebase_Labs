@@ -17,7 +17,8 @@ services:
       - ./backend/src/db_scripts:/docker-entrypoint-initdb.d/
     networks:
       - backend
-  backend:
+
+  backend: &backend
     build: ./backend
     image: medical_exams_api:tag
     container_name: medical_exams_backend
@@ -25,14 +26,32 @@ services:
       - 3001:3001
     environment:
       - DATABASE_URL=postgres://postgres:password@db:5432/medical_exams
+      - REDIS_URL=redis://redis:6379/0
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - ./backend/src:/usr/src/app/backend/src
+      - rubygems:/usr/local/bundle
     networks:
       - frontend
       - backend
+
+  sidekik:
+    <<: *backend
+    container_name: medical_exams_sidekiq
+    depends_on:
+      - redis
+    ports: []
+    command: sidekiq -r ./src/jobs/csv_import_job.rb
+
+  redis:
+    image: redis:6.2-alpine
+    container_name: medical_exams_redis
+    restart: 'always'
+    networks:
+      - backend
+
   frontend:
     build: ./frontend
     image: medical_exams_client:tag
@@ -50,3 +69,7 @@ services:
 networks:
   frontend:
   backend:
+
+volumes:
+  rubygems:
+  sidekik_rubygems:
