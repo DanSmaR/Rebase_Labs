@@ -1,4 +1,4 @@
-require 'spec_helper'
+require_relative './spec_helper.rb'
 require_relative '../database/db_manager.rb'
 require_relative '../database/database_setup'
 
