@@ -1,9 +1,5 @@
 export default class {
-  URL = 'http://localhost:3000/data'
-
-  constructor(params) {
-      this.params = params;
-  }
+  URL = '/data';
 
   setTitle(title) {
       document.title = title;
