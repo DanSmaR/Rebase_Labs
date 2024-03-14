@@ -11,6 +11,10 @@ get '/exams' do
   erb :index
 end
 
+get '/exams/:token' do
+  erb :index
+end
+
 get '/search' do
   erb :index
 end
@@ -35,9 +39,6 @@ end
 # This route is used to upload the CSV file to the backend
 post '/upload' do
   content_type :json
-
-  puts 'Params:'
-  puts params.inspect
 
   unless params[:csvFile] && params[:csvFile] != 'undefined' &&
     (tmpfile = params[:csvFile][:tempfile]) &&
