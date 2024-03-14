@@ -1,8 +1,17 @@
 require_relative './database/db_manager.rb'
 
 class ExamDataBuilder
-  def self.get_exams_from_db(query, *params)
-    result = DBManager.conn.exec_params(query, params)
+  QUERY = <<~SQL.gsub("\n", " ")
+    SELECT p.*, d.*, e.*, t.*
+    FROM exams e
+    JOIN patients p ON p.cpf = e.patient_cpf
+    JOIN doctors d ON d.crm = e.doctor_crm
+    JOIN tests t ON t.exam_token = e.token
+  SQL
+
+  def self.get_exams_from_db(*params)
+    final_query = params.any? ? "#{QUERY} WHERE e.token = $1;" : "#{QUERY};"
+    result = DBManager.conn.exec_params(final_query, params)
     result.map { |row| row }
   end
 

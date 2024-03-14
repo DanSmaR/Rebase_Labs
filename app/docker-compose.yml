@@ -41,7 +41,8 @@ services:
     <<: *backend
     container_name: medical_exams_sidekiq
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     ports: []
     command: sidekiq -r ./src/jobs/csv_import_job.rb
 
@@ -49,6 +50,11 @@ services:
     image: redis:6.2-alpine
     container_name: medical_exams_redis
     restart: 'always'
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
     networks:
       - backend
 

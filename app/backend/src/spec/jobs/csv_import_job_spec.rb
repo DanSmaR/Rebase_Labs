@@ -17,8 +17,8 @@ RSpec.describe CSVImportJob do
     end
 
     it 'calls the necessary methods and deletes the file' do
-      expect(DatabaseSetup).to receive(:prepare_statements)
-      expect(DatabaseSetup).to receive(:insert_csv_data).with(file_path)
+      expect(DatabaseSetup).to receive(:prepare_statements).with(mock_conn)
+      expect(DatabaseSetup).to receive(:insert_csv_data).with(file_path, mock_conn)
       expect(File).to receive(:delete).with(file_path)
 
       CSVImportJob.new.perform(file_path)
@@ -30,8 +30,8 @@ RSpec.describe CSVImportJob do
       end
 
       it 'calls the necessary methods but does not delete the file' do
-        expect(DatabaseSetup).to receive(:prepare_statements)
-        expect(DatabaseSetup).to receive(:insert_csv_data).with(file_path)
+        expect(DatabaseSetup).to receive(:prepare_statements).with(mock_conn)
+        expect(DatabaseSetup).to receive(:insert_csv_data).with(file_path, mock_conn)
         expect(File).not_to receive(:delete)
 
         CSVImportJob.new.perform(file_path)

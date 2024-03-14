@@ -16,12 +16,19 @@ CREATE TABLE IF NOT EXISTS patients (
   );
 
   CREATE TABLE IF NOT EXISTS exams (
-    id SERIAL PRIMARY KEY,
+    token VARCHAR PRIMARY KEY,
     patient_cpf VARCHAR REFERENCES patients(cpf),
     doctor_crm VARCHAR REFERENCES doctors(crm),
-    token VARCHAR,
-    exam_date DATE,
+    exam_date DATE
+  );
+
+  CREATE TABLE IF NOT EXISTS tests (
+    id SERIAL PRIMARY KEY,
+    exam_token VARCHAR REFERENCES exams(token),
     exam_type VARCHAR,
     exam_limits VARCHAR,
     exam_result VARCHAR
   );
+
+  ALTER TABLE tests
+  ADD CONSTRAINT unique_exam_token_and_type UNIQUE (exam_token, exam_type);
