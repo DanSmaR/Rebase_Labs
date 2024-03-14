@@ -1,6 +1,4 @@
 require_relative '../spec_helper.rb'
-require 'faraday'
-require 'json'
 
 RSpec.describe 'User visits home page', type: :feature, js: true do
   it 'and sees a navbar and the content successfully' do
@@ -12,6 +10,9 @@ RSpec.describe 'User visits home page', type: :feature, js: true do
       expect(page).to have_link 'Início', href: '/'
       expect(page).to have_link 'Exames', href: '/exams'
       expect(page).to have_link 'Busca por Token', href: '/search'
+
+      expect(page).to have_field 'csvFile', type: 'file'
+      expect(page).to have_button 'Enviar CSV'
     end
 
     expect(page).to have_content 'Exames Médicos'

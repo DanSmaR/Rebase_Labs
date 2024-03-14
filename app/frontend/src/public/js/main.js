@@ -2,12 +2,18 @@ import ExamsView from "./ExamsView.js";
 import HomeView from "./HomeView.js";
 import SearchView from "./SearchView.js";
 
+const importCSVBtn = document.getElementById('import-csv-btn');
+const notice = document.getElementById('notice');
+
 const navigateTo = url => {
   history.pushState(null, null, url);
   router();
 };
 
 const router = () => {
+  notice.classList.remove('success', 'invalid', 'error');
+  notice.innerText = '';
+
   const routes = [
     { path: "/", view: HomeView },
     { path: "/exams", view: ExamsView },
@@ -53,3 +59,39 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   router();
 })
+
+importCSVBtn.addEventListener('click', (ev) => {
+  ev.preventDefault();
+
+  const fileInput = document.getElementById('csv-file');
+  const file = fileInput.files[0];
+  const formData = new FormData();
+
+  formData.append('csvFile', file);
+
+  fetch('/upload', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+
+    if (data.success) {
+      notice.classList.add('success');
+      notice.innerText = 'Arquivo enviado com sucesso!';
+      document.getElementById('csv-file').value = '';
+    } else if (data.success === false) {
+      notice.classList.add('invalid');
+      notice.innerText = 'Arquivo não selecionado ou inválido!'
+    } else if (data.error) {
+      notice.classList.add('error');
+      notice.innerText = 'Erro ao enviar arquivo! Tente novamente.';
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    notice.classList.add('error');
+    notice.innerText = 'Erro ao enviar arquivo! Tente novamente.';
+  });
+});

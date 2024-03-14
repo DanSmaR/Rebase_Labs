@@ -14,7 +14,11 @@
         <li><a href="/search" class="nav__link" data-link>Busca por Token</a></li>
       </ul>
     </nav>
+
+    <input type="file" id="csv-file" name="csvFile" accept=".csv" aria-label="Selecione um arquivo CSV">
+    <button type='click' id="import-csv-btn">Enviar CSV</button>
   </header>
+  <p id='notice'></p>
   <main id="app"></main>
   <script type="module" src="/js/main.js"></script>
 </body>
