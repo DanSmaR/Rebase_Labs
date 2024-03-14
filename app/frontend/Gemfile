@@ -6,6 +6,7 @@ gem 'rackup'
 gem 'puma'
 gem 'json'
 gem 'faraday'
+gem 'faraday-multipart'
 
 group :test do
   gem 'rspec'
