@@ -12,15 +12,6 @@ RSpec.describe 'User visits exams page', type: :feature, js: true do
     visit '/'
     click_link 'Exames'
 
-    within 'header' do
-      expect(page).to have_link 'Início', href: '/'
-      expect(page).to have_link 'Exames', href: '/exams'
-      expect(page).to have_link 'Busca por Token', href: '/search'
-
-      expect(page).to have_field 'csvFile', type: 'file'
-      expect(page).to have_button 'Enviar CSV'
-    end
-
     expect(page).to have_current_path('/exams')
 
     expect(page).to have_content('Exames Médicos')

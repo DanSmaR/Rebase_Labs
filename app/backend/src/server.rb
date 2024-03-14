@@ -42,16 +42,16 @@ post '/import' do
       CSVImportJob.perform_async(file_path)
 
       status 200
-      { success: true, message: 'Data imported successfully' }.to_json
+      { message: 'Data imported successfully' }.to_json
     else
       status 400
-      { sucess: false, message: 'No file was uploaded' }.to_json
+      { message: 'No file was uploaded' }.to_json
     end
   rescue => e
     puts e.message
 
     status 500
-    { error: true,  message: 'An error occurred while importing data. Try again' }.to_json
+    { message: 'An error occurred while importing data. Try again' }.to_json
   end
 end
 
