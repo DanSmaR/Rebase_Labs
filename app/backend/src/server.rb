@@ -5,18 +5,11 @@ require_relative './database/database_setup.rb'
 require_relative './exam_data_builder.rb'
 require_relative './jobs/csv_import_job.rb'
 
-QUERY = <<~SQL.gsub("\n", " ")
-  SELECT p.*, d.*, e.*
-  FROM exams e
-  JOIN patients p ON p.cpf = e.patient_cpf
-  JOIN doctors d ON d.crm = e.doctor_crm
-SQL
-
 get '/tests' do
   content_type :json
   response.headers['Access-Control-Allow-Origin'] = '*'
 
-  result = ExamDataBuilder.get_exams_from_db("#{QUERY};")
+  result = ExamDataBuilder.get_exams_from_db
 
   response = result.group_by { |item| item['token'] }.map do |token, items|
     ExamDataBuilder.build_exam_data(items)
@@ -28,15 +21,7 @@ end
 get '/tests/:token' do
   content_type :json
 
-  token = params['token']
-
-  params = []
-
-  if token && !token.empty?
-    params << token
-  end
-
-  result = ExamDataBuilder.get_exams_from_db("#{QUERY} WHERE e.token = $1;", *params)
+  result = ExamDataBuilder.get_exams_from_db(params[:token])
 
   response = result.group_by { |item| item['token'] }.map do |token, items|
     ExamDataBuilder.build_exam_data(items)
