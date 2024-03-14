@@ -3,14 +3,18 @@ require_relative '../support/test_data.rb'
 require 'faraday'
 require 'json'
 
-RSpec.describe 'User visits search page', type: :feature, js: true do
-  it 'and search for a exam by token successfully' do
+RSpec.describe 'User sees detailed exam page', type: :feature, js: true do
+  it 'when clicking on a specific token from list' do
     conn = instance_double(Faraday::Connection)
     allow(Faraday).to receive(:new).and_return(conn)
+    allow(conn).to receive(:get).with('tests').and_return(double(body: [api_response[0]].to_json))
     allow(conn).to receive(:get).with('tests/IQCZ17').and_return(double(body: [api_response[0]].to_json))
 
-    visit '/'
-    click_link 'Busca por Token'
+    visit '/exams'
+
+    click_link 'IQCZ17'
+
+    expect(page).to have_current_path('/exams/IQCZ17')
 
     within 'header' do
       expect(page).to have_link 'Início', href: '/'
@@ -20,12 +24,6 @@ RSpec.describe 'User visits search page', type: :feature, js: true do
       expect(page).to have_field 'csvFile', type: 'file'
       expect(page).to have_button 'Enviar CSV'
     end
-
-    expect(page).to have_current_path('/search')
-    expect(page).to have_content('Busca de Exames por Token')
-
-    fill_in 'token', with: 'IQCZ17'
-    click_button 'Pesquisar'
 
     expect(page).to have_content 'Detalhe Exame Médico IQCZ17 feito em 05/08/2021'
 

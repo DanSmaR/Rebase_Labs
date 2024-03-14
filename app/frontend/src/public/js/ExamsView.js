@@ -1,8 +1,8 @@
 import AbstractView from "./AbstractView.js";
 
 export default class extends AbstractView {
-  constructor() {
-    super();
+  constructor(params) {
+    super(params);
     this.setTitle("Lista de Exames Médicos");
   }
 
@@ -36,5 +36,45 @@ export default class extends AbstractView {
           reject(fragment);
         });
     })
+  }
+
+  createTable(exams) {
+    const tableHTML = `
+      <caption>Exames médicos</caption>
+      
+      <thead>
+        <tr>
+          <td>Token</td>
+          <td>Data do Exame</td>
+          <td>CPF</td>
+          <td>Nome</td>
+          <td>Cidade</td>
+          <td>Estado</td>
+          <td>Nome do Médico</td>
+          <td>CRM do Médico</td>
+        </tr>
+      </thead>
+    `;
+    const table = document.createElement('table');
+    table.innerHTML = tableHTML;
+    const tableBody = document.createElement('tbody');
+
+    exams.forEach(exam => {
+      const examRow = document.createElement('tr');
+      examRow.innerHTML = `
+          <td><a href="/exams/${exam.token}">${exam.token}</a></td>
+          <td>${exam.exam_date}</td>
+          <td>${exam.cpf}</td>
+          <td>${exam.name}</td>
+          <td>${exam.city}</td>
+          <td>${exam.state}</td>
+          <td>${exam.doctor.name}</td>
+          <td>${exam.doctor.crm}</td>
+        `;
+        tableBody.appendChild(examRow);
+    });
+
+    table.appendChild(tableBody);
+    return table;
   }
 }

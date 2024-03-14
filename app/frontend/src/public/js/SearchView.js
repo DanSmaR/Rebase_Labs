@@ -1,9 +1,11 @@
 import AbstractView from "./AbstractView.js";
+import ExamDetailView from "./ExamDetailView.js";
 
 export default class extends AbstractView {
-  constructor() {
-    super();
+  constructor(params) {
+    super(params);
     this.setTitle("Busca de Exames por Token");
+    this.examDetailView = new ExamDetailView(params);
   }
 
   getHtml() {
@@ -36,8 +38,10 @@ export default class extends AbstractView {
         fetch(this.URL + `?token=${token}`)
           .then((response) => response.json())
           .then((data) => {
-            const table = this.createTable(data);
-            app.appendChild(table);
+            const descriptionList = this.examDetailView.createExamsDescriptionList(data);
+            const tableTests = this.examDetailView.createTestsTable(data);
+            app.appendChild(descriptionList);
+            app.appendChild(tableTests);
           });
       }
     });
