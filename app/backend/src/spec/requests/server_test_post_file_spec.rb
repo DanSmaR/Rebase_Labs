@@ -29,7 +29,7 @@ RSpec.describe 'Server' do
         end
         expect(CSVImportJob).to have_received(:perform_async).with(import_file_path)
         expect(last_response).to be_ok
-        expect(last_response.body).to eq({ message: 'Data imported successfully' }.to_json)
+        expect(last_response.body).to eq({ success: true, message: 'Data imported successfully' }.to_json)
       end
     end
 
@@ -37,7 +37,7 @@ RSpec.describe 'Server' do
       it 'returns a bad request response' do
         post '/import'
         expect(last_response).to be_bad_request
-        expect(last_response.body).to eq({ message: 'No file was uploaded' }.to_json)
+        expect(last_response.body).to eq({ sucess: false, message: 'No file was uploaded' }.to_json)
       end
     end
 
@@ -49,7 +49,7 @@ RSpec.describe 'Server' do
         post '/import', file: Rack::Test::UploadedFile.new(file_path, 'text/csv')
 
         expect(last_response).to be_server_error
-        expect(JSON.parse(last_response.body)).to eq({ 'message' => 'An error occurred while importing data. Try again' })
+        expect(JSON.parse(last_response.body)).to eq({"error"=>true, "message"=>"An error occurred while importing data. Try again"})
       end
     end
 
