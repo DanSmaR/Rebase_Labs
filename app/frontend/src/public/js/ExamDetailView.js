@@ -43,41 +43,44 @@ export default class extends AbstractView {
 
     const examDate = new Date(exams[0].exam_date);
     
-    heading1.innerHTML = `Detalhe Exame Médico ${exams[0].token} feito em <time datetime="${exams[0].exam_date}">${examDate.toLocaleDateString('pt-BR')}</time>`;
+    heading1.innerHTML = "Detalhe Exame Médico";
     
-    const descriptionList = document.createElement('dl');
-      
-    descriptionList.innerHTML = `
-      <dt>CPF</dt>
-      <dd>${exams[0].cpf}</dd>
-      <dt>Nome</dt>
-      <dd>${exams[0].name}</dd>
-      <dt>E-mail</dt>
-      <dd>${exams[0].email}</dd>
-      <dt>Data de Nascimento</dt>
-      <dd>${exams[0].birthday}</dd>
-      <dt>Endereço</dt>
-      <dd>${exams[0].address}</dd>
-      <dt>Cidade</dt>
-      <dd>${exams[0].city}</dd>
-      <dt>Estado</dt>
-      <dd>${exams[0].state}</dd>
-      <dt>Médico</dt>
-      <dd>${exams[0].doctor.name}</dd>
-      <dt>E-mail do Médico</dt>
-      <dd>${exams[0].doctor.email}</dd>
-      <dt>CRM do Médico</dt>
-      <dd>${exams[0].doctor.crm}</dd>
-      <dt>CRM Estado</dt>
-      <dd>${exams[0].doctor.crm_state}</dd>
+    const containerList = document.createElement('div');
+    containerList.classList.add('card');
+
+    containerList.innerHTML = `
+      <h3 class="detail-exam-title">Exame ${exams[0].token} feito em <time datetime="${exams[0].exam_date}">${examDate.toLocaleDateString('pt-BR')}</time></h3>
+      <dl class="card-body">
+        <dt class="card-subtitle mb-2 text-body-secondary">CPF</dt>
+        <dd class="detail-exam-data">${exams[0].cpf}</dd>
+        <dt class="card-subtitle mb-2 text-body-secondary">Nome</dt>
+        <dd class="detail-exam-data">${exams[0].name}</dd>
+        <dt class="card-subtitle mb-2 text-body-secondary">E-mail</dt>
+        <dd class="detail-exam-data">${exams[0].email}</dd>
+        <dt class="card-subtitle mb-2 text-body-secondary">Data de Nascimento</dt>
+        <dd class="detail-exam-data">${exams[0].birthday}</dd>
+        <dt class="card-subtitle mb-2 text-body-secondary">Endereço</dt>
+        <dd class="detail-exam-data">${exams[0].address}</dd>
+        <dt class="card-subtitle mb-2 text-body-secondary">Cidade</dt>
+        <dd class="detail-exam-data" class="card-subtitle mb-2 text-body-secondary">${exams[0].city}</dd>
+        <dt class="card-subtitle mb-2 text-body-secondary">Estado</dt>
+        <dd class="detail-exam-data">${exams[0].state}</dd>
+        <dt class="card-subtitle mb-2 text-body-secondary">Médico</dt>
+        <dd class="detail-exam-data">${exams[0].doctor.name}</dd>
+        <dt class="card-subtitle mb-2 text-body-secondary">E-mail do Médico</dt>
+        <dd class="detail-exam-data">${exams[0].doctor.email}</dd>
+        <dt class="card-subtitle mb-2 text-body-secondary">CRM do Médico</dt>
+        <dd class="detail-exam-data">${exams[0].doctor.crm}</dd>
+        <dt class="card-subtitle mb-2 text-body-secondary">CRM Estado</dt>
+        <dd class="detail-exam-data">${exams[0].doctor.crm_state}</dd>
+      </dl>
     `;
 
     fragment.appendChild(heading1);
-    fragment.appendChild(descriptionList);
+    fragment.appendChild(containerList);
 
     return fragment;
   }
-
 
   createTestsTable(exams) {
     const tableHead = `
@@ -85,13 +88,15 @@ export default class extends AbstractView {
       
       <thead>
         <tr>
-          <td>Tipo de Exame</td>
-          <td>Limites</td>
-          <td>Resultado</td>
+          <th scope="col">Tipo de Exame</th>
+          <th scope="col">Limites</th>
+          <th scope="col">Resultado</th>
         </tr>
       </thead>
       `;
+
       const table = document.createElement('table');
+      table.classList.add('table', 'table-hover');
       table.innerHTML = tableHead;
       const tableBody = document.createElement('tbody');
       

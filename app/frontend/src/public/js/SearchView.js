@@ -17,8 +17,10 @@ export default class extends AbstractView {
     const form = document.createElement('form');
     form.role = 'search';
     form.innerHTML = `
-      <input type="search" id="token" name="token" placeholder="Busca por Token" aria-label="Pesquisa de Exames por Token" required>
-      <input type="submit" value="Pesquisar">
+      <div class="input-group mb-3">
+        <input type="search" class="form-control" id="token" name="token" placeholder="Busca por Token" aria-label="Pesquisa de Exames por Token" required>
+        <button type="submit" class="btn btn-outline-secondary">Pesquisar</button>
+      </div>
     `;
 
     form.addEventListener('submit', (event) => {

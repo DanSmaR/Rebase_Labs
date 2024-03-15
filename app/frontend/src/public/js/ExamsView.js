@@ -43,19 +43,20 @@ export default class extends AbstractView {
       <caption>Exames médicos</caption>
       
       <thead>
-        <tr>
-          <td>Token</td>
-          <td>Data do Exame</td>
-          <td>CPF</td>
-          <td>Nome</td>
-          <td>Cidade</td>
-          <td>Estado</td>
-          <td>Nome do Médico</td>
-          <td>CRM do Médico</td>
+        <tr class="table-header">
+          <th scope="col">Token</th>
+          <th scope="col">Data do Exame</th>
+          <th scope="col">CPF</th>
+          <th scope="col">Nome</th>
+          <th scope="col">Cidade</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Nome do Médico</th>
+          <th scope="col">CRM do Médico</th>
         </tr>
       </thead>
     `;
     const table = document.createElement('table');
+    table.classList.add('table', 'table-hover');
     table.innerHTML = tableHTML;
     const tableBody = document.createElement('tbody');
 
