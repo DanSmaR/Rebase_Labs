@@ -89,24 +89,25 @@ importCSVBtn.addEventListener('click', (ev) => {
   })
   .then(response => response.json())
   .then(data => {
-    console.log(data);
-
     if (data.success) {
+      fileInput.value = '';
       notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
       notice.classList.add('alert', 'alert-success');
       notice.innerText = 'Arquivo enviado com sucesso!';
-      document.getElementById('csv-file').value = '';
     } else if (data.success === false) {
+      fileInput.value = '';
       notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
       notice.classList.add('alert', 'alert-warning');
       notice.innerText = 'Arquivo não selecionado ou inválido!'
     } else if (data.error) {
+      fileInput.value = '';
       notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
       notice.classList.add('alert', 'alert-danger');
       notice.innerText = 'Erro ao enviar arquivo! Tente novamente.';
     }
   })
   .catch(error => {
+    fileInput.value = '';
     console.error('Error:', error);
     notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
     notice.classList.add('alert', 'alert-danger');

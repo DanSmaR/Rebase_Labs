@@ -9,7 +9,12 @@ export default class extends AbstractView {
   }
 
   getHtml() {
+    // const notice = document.getElementById('notice');
+    // notice.role = 'alert'
+
     const fragment = new DocumentFragment();
+    const article = document.createElement('article');
+    article.classList.add('exam-data');
 
     const heading1 = document.createElement('h1');
     heading1.innerText = 'Busca de Exames por Token'
@@ -25,25 +30,45 @@ export default class extends AbstractView {
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
+
+      notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+      notice.innerText = "";
       
       app = document.querySelector("#app");
       
-      const oldTable = document.querySelector('table');
+      const examData = document.querySelector('.exam-data');
 
-      if (oldTable) {
-        app.removeChild(oldTable);
+      if (examData) {
+        while(examData.firstChild) {
+          examData.removeChild(examData.firstChild);
+        }
+        app.removeChild(examData);
       }
 
-      const token = document.getElementById('token').value;
+      const inputSearch = document.getElementById('token');
+      const token = inputSearch.value;
+      inputSearch.value = "";
 
       if (token) {
         fetch(this.URL + `?token=${token}`)
           .then((response) => response.json())
           .then((data) => {
-            const descriptionList = this.examDetailView.createExamsDescriptionList(data);
-            const tableTests = this.examDetailView.createTestsTable(data);
-            app.appendChild(descriptionList);
-            app.appendChild(tableTests);
+            if (data.length == 0) {
+              notice.classList.add('alert', 'alert-warning');
+              notice.innerText = 'Exame não encontrado.'
+            } else {
+              const descriptionList = this.examDetailView.createExamsDescriptionList(data);
+              const tableTests = this.examDetailView.createTestsTable(data);
+              article.appendChild(descriptionList)
+              article.appendChild(tableTests)
+              app.appendChild(article);
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+            notice.classList.add('alert', 'alert-danger');
+            notice.innerText = 'Não foi possível completar sua ação. Tente novamente';
           });
       }
     });
