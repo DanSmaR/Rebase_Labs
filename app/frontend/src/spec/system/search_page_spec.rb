@@ -75,4 +75,17 @@ RSpec.describe 'User visits search page', type: :feature, js: true do
     expect(page).to_not have_content('B0002IQM66')
     expect(page).to_not have_content('SC')
   end
+
+  it 'and sees an error message when the token is not found' do
+    conn = instance_double(Faraday::Connection)
+    allow(Faraday).to receive(:new).and_return(conn)
+    allow(conn).to receive(:get).with('tests/blablabla').and_return(double(body: [].to_json))
+
+    visit '/search'
+
+    fill_in 'token', with: 'blablabla'
+    click_button 'Pesquisar'
+
+    expect(page).to have_content 'Exame não encontrado.'
+  end
 end
