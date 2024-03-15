@@ -25,7 +25,8 @@ RSpec.describe 'User sees detailed exam page', type: :feature, js: true do
       expect(page).to have_button 'Enviar CSV'
     end
 
-    expect(page).to have_content 'Detalhe Exame Médico IQCZ17 feito em 05/08/2021'
+    expect(page).to have_content 'Detalhe Exame Médico'
+    expect(page).to have_content 'Exame IQCZ17 feito em 05/08/2021'
 
     expect(page).to have_content('CPF')
     expect(page).to have_content('Nome')

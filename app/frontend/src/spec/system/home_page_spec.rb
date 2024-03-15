@@ -16,6 +16,12 @@ RSpec.describe 'User visits home page', type: :feature, js: true do
     end
 
     expect(page).to have_content 'Exames Médicos'
-    expect(page).to have_content 'Acesse os exames cadastrados em nossa base de dados pelo menu acima'
+    expect(page).to have_content 'Navegue pela nosso site pelos menus acima'
+    expect(page).to have_content 'Acesse todos os exames cadastrados'
+    expect(page).to have_content 'Busque por um exame específico passando um token no campo de busca'
+
+    expect(page).to have_link 'exames', href: '/exams'
+    expect(page).to have_link 'Busque por um exame específico', href: '/search'
+
   end
 end

@@ -5,6 +5,7 @@ import SearchView from "./SearchView.js";
 
 const importCSVBtn = document.getElementById('import-csv-btn');
 const notice = document.getElementById('notice');
+notice.role = 'alert'
 
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
@@ -23,7 +24,7 @@ const navigateTo = url => {
 };
 
 const router = () => {
-  notice.classList.remove('success', 'invalid', 'error');
+  notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
   notice.innerText = '';
 
   const routes = [
@@ -91,20 +92,24 @@ importCSVBtn.addEventListener('click', (ev) => {
     console.log(data);
 
     if (data.success) {
-      notice.classList.add('success');
+      notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+      notice.classList.add('alert', 'alert-success');
       notice.innerText = 'Arquivo enviado com sucesso!';
       document.getElementById('csv-file').value = '';
     } else if (data.success === false) {
-      notice.classList.add('invalid');
+      notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+      notice.classList.add('alert', 'alert-warning');
       notice.innerText = 'Arquivo não selecionado ou inválido!'
     } else if (data.error) {
-      notice.classList.add('error');
+      notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+      notice.classList.add('alert', 'alert-danger');
       notice.innerText = 'Erro ao enviar arquivo! Tente novamente.';
     }
   })
   .catch(error => {
     console.error('Error:', error);
-    notice.classList.add('error');
+    notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+    notice.classList.add('alert', 'alert-danger');
     notice.innerText = 'Erro ao enviar arquivo! Tente novamente.';
   });
 });

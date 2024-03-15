@@ -27,7 +27,8 @@ RSpec.describe 'User visits search page', type: :feature, js: true do
     fill_in 'token', with: 'IQCZ17'
     click_button 'Pesquisar'
 
-    expect(page).to have_content 'Detalhe Exame Médico IQCZ17 feito em 05/08/2021'
+    expect(page).to have_content 'Detalhe Exame Médico'
+    expect(page).to have_content 'Exame IQCZ17 feito em 05/08/2021'
 
     expect(page).to have_content('CPF')
     expect(page).to have_content('Nome')

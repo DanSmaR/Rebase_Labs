@@ -1,0 +1,48 @@
+body {
+  font-size: 1.2rem;
+}
+
+.alert {
+	text-align: center;
+	width: 70%;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.card {
+  width: 80%;
+  min-width: 400px;
+  z-index: -1;
+}
+
+.card-subtitle {
+  font-size: 1.2rem;
+}
+
+.detail-exam-title {
+  text-align: center;
+}
+
+.detail-exam-data {
+  margin-left: 3rem;
+}
+
+.header {
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: space-around;
+  position: sticky;
+  top: 0;
+}
+
+.input-group {
+  max-width: 900px;
+}
+.upload-input {
+  align-items: center;
+}
+
+.table-header {
+  position: sticky;
+  top: 56px;
+}
