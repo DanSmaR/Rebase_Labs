@@ -66,6 +66,7 @@ RSpec.describe 'User visits exams page', type: :feature, js: true do
       visit '/'
       click_link 'Exames'
 
+      expect(page).to have_content 'Não foi possível completar sua ação. Tente novamente'
 
     end
 
