@@ -9,35 +9,26 @@ export default class extends AbstractView {
   getHtml() {
     const fragment = new DocumentFragment();
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       fetch(this.URL + `?token=${this.params.token}`)
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
-            window.notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
-            window.notice.classList.add('alert', 'alert-danger');
-            window.notice.innerText = 'Não foi possível completar sua ação. Tente novamente';
-          } else {
-            const descriptionList = this.createExamsDescriptionList(data);
-            const tableTests = this.createTestsTable(data);
-  
-            fragment.appendChild(descriptionList);
-            fragment.appendChild(tableTests);
+            throw new Error(data.message);
           }
+          const descriptionList = this.createExamsDescriptionList(data);
+          const tableTests = this.createTestsTable(data);
 
+          fragment.appendChild(descriptionList);
+          fragment.appendChild(tableTests);
+          
           resolve(fragment);
         })
         .catch((error) => {
           console.log(error);
-          const errorMsgTitle = document.createElement('h2');
-          errorMsgTitle.innerText = 'Erro!';
-
-          const errorMsgContent = document.createElement('p');
-          errorMsgContent.innerText = 'Sua solicitação não pode ser efetuada no momento. Tente Mais Tarde';
-
-          fragment.appendChild(errorMsgTitle);
-          fragment.appendChild(errorMsgContent);
-          reject(fragment);
+          window.notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+          window.notice.classList.add('alert', 'alert-danger');
+          window.notice.innerText = 'Não foi possível completar sua ação. Tente novamente';
         });
     })
   }
