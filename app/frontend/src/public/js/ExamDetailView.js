@@ -11,11 +11,11 @@ export default class extends AbstractView {
 
     return new Promise((resolve, _reject) => {
       fetch(this.URL + `?token=${this.params.token}`)
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.status === 500) throw new Error('An error has ocurred. Try again');
+          return response.json();
+        })
         .then((data) => {
-          if (data.error) {
-            throw new Error(data.message);
-          }
           const descriptionList = this.createExamsDescriptionList(data);
           const tableTests = this.createTestsTable(data);
 

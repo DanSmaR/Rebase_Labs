@@ -89,13 +89,12 @@ importCSVBtn.addEventListener('click', (ev) => {
     method: 'POST',
     body: formData
   })
-  .then(response => response.json())
+  .then((response) => {
+    if (response.status === 500) throw new Error('An error has ocurred. Try again');
+    return response.json();
+  })
   .then(data => {
     fileInput.value = '';
-
-    if (data.error) {
-      throw new Error(data.message)
-    }
     if (data.success) {
       notice.classList.add('alert', 'alert-success');
       notice.innerText = 'Arquivo enviado com sucesso!';

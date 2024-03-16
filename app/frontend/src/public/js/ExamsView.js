@@ -14,11 +14,11 @@ export default class extends AbstractView {
     
     return new Promise((resolve, _reject) => {
       fetch(this.URL)
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.status === 500) throw new Error('An error has ocurred. Try again');
+          return response.json();
+        })
         .then((data) => {
-          if (data.error) {
-            throw new Error(data.message);
-          }
           const table = this.createTable(data);
 
           fragment.appendChild(heading1);
