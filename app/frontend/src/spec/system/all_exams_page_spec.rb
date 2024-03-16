@@ -60,7 +60,7 @@ RSpec.describe 'User visits exams page', type: :feature, js: true do
   end
 
   context "when server error occurs" do
-    it "sees a message error" do
+    it "sees an error message" do
       mock_conn = instance_double(Faraday::Connection)
 
       allow(ApiService).to receive(:connection).and_return(mock_conn)
