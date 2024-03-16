@@ -8,16 +8,22 @@ export default class extends AbstractView {
 
   getHtml() {
     const fragment = new DocumentFragment();
-    
+
     return new Promise((resolve, reject) => {
       fetch(this.URL + `?token=${this.params.token}`)
         .then((response) => response.json())
         .then((data) => {
-          const descriptionList = this.createExamsDescriptionList(data);
-          const tableTests = this.createTestsTable(data);
-
-          fragment.appendChild(descriptionList);
-          fragment.appendChild(tableTests);
+          if (data.error) {
+            window.notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+            window.notice.classList.add('alert', 'alert-danger');
+            window.notice.innerText = 'Não foi possível completar sua ação. Tente novamente';
+          } else {
+            const descriptionList = this.createExamsDescriptionList(data);
+            const tableTests = this.createTestsTable(data);
+  
+            fragment.appendChild(descriptionList);
+            fragment.appendChild(tableTests);
+          }
 
           resolve(fragment);
         })

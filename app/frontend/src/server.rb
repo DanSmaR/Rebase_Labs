@@ -35,7 +35,10 @@ get '/data' do
     else
       response = ApiService.get_exams(conn)
     end
-  rescue Faraday::ServerError, Faraday::Connection => e
+  rescue Faraday::ServerError, Faraday::Connection, Faraday::ConnectionFailed => e
+    puts '------------- Frontend Error GET /data ---------------'
+    puts e
+
     status 500
     return { error: true,  message: 'An error has occurred. Try again' }.to_json
   end
@@ -65,7 +68,7 @@ post '/upload' do
     status 200
     { success: true, message: 'Data imported successfully' }.to_json
 
-  rescue Faraday::ServerError, Faraday::Connection => e
+  rescue Faraday::ServerError, Faraday::Connection, Faraday::ConnectionFailed => e
     puts e
 
     status 500
