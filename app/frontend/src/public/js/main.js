@@ -83,6 +83,8 @@ importCSVBtn.addEventListener('click', (ev) => {
 
   formData.append('csvFile', file);
   
+  notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+  
   fetch('/upload', {
     method: 'POST',
     body: formData
@@ -95,18 +97,15 @@ importCSVBtn.addEventListener('click', (ev) => {
       throw new Error(data.message)
     }
     if (data.success) {
-      notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
       notice.classList.add('alert', 'alert-success');
       notice.innerText = 'Arquivo enviado com sucesso!';
     } else {
-      notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
       notice.classList.add('alert', 'alert-warning');
       notice.innerText = 'Arquivo não selecionado ou inválido!'
     }
   })
   .catch(error => {
-    console.error('Error:', error.messages);
-    notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+    console.error('Error:', error.message);
     notice.classList.add('alert', 'alert-danger');
     notice.innerText = 'Erro ao enviar arquivo! Tente novamente.';
   });

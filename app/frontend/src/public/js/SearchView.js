@@ -9,9 +9,6 @@ export default class extends AbstractView {
   }
 
   getHtml() {
-    // const notice = document.getElementById('notice');
-    // notice.role = 'alert'
-
     const fragment = new DocumentFragment();
     const article = document.createElement('article');
     article.classList.add('exam-data');
@@ -66,7 +63,6 @@ export default class extends AbstractView {
           })
           .catch(error => {
             console.error(error);
-            notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
             notice.classList.add('alert', 'alert-danger');
             notice.innerText = 'Não foi possível completar sua ação. Tente novamente';
           });
