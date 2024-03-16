@@ -3,15 +3,24 @@ require 'faraday'
 require 'faraday/multipart'
 
 RSpec.describe 'User sends csv file', type: :feature, js: true do
-  let(:mock_conn) { double('Faraday::Connection') }
   let(:mock_file_part) { double('Faraday::Multipart::FilePart') }
 
   before do
-    allow(Faraday).to receive(:new).with(url: 'http://backend:3001').and_return(mock_conn)
     allow(Faraday::Multipart::FilePart).to receive(:new).with(any_args).and_return(mock_file_part)
   end
+
+  after do
+    ApiService.instance_variable_set(:@conn, nil)
+  end
+
   it 'and sees a successful message' do
-    allow(mock_conn).to receive(:post).with('import', { :file => mock_file_part }).and_return(double('response', status: 200))
+    mock_conn = instance_double(Faraday::Connection)
+    mock_response = instance_double(Faraday::Response)
+
+    allow(ApiService).to receive(:connection).and_return(mock_conn)
+    allow(ApiService).to receive(:send_file).with(mock_conn, { :file => mock_file_part }).and_return(mock_response)
+    allow(mock_response).to receive(:status).and_return(200)
+
     visit '/'
 
     within 'header' do

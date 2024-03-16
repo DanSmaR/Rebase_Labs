@@ -4,6 +4,10 @@ require 'faraday'
 require 'json'
 
 RSpec.describe 'User sees detailed exam page', type: :feature, js: true do
+  after do
+    ApiService.instance_variable_set(:@conn, nil)
+  end
+
   it 'when clicking on a specific token from list' do
     token = 'IQCZ17'
     mock_conn = instance_double(Faraday::Connection)

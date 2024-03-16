@@ -4,6 +4,9 @@ require 'faraday'
 require 'json'
 
 RSpec.describe 'User visits exams page', type: :feature, js: true do
+  after do
+    ApiService.instance_variable_set(:@conn, nil)
+  end
   it 'and see all exams successfully' do
     mock_conn = instance_double(Faraday::Connection)
     mock_response = instance_double(Faraday::Response)

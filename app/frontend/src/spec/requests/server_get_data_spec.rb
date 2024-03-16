@@ -17,6 +17,10 @@ RSpec.describe 'Server' do
       allow(ApiService).to receive(:connection).and_return(mock_conn)
     end
 
+    after do
+      ApiService.instance_variable_set(:@conn, nil)
+    end
+
     it 'returns the exams data' do
       api_response_json = api_response.to_json
 

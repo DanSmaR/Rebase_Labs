@@ -18,6 +18,10 @@ RSpec.describe 'Upload Endpoint' do
       allow(Faraday::Multipart::FilePart).to receive(:new).with(any_args).and_return(mock_file_part)
     end
 
+    after do
+      ApiService.instance_variable_set(:@conn, nil)
+    end
+
     it 'returns 200 when a file is uploaded' do
       allow(ApiService).to receive(:send_file).with(mock_conn, { :file => mock_file_part }).and_return(mock_response)
 

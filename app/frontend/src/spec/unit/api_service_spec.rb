@@ -4,6 +4,10 @@ require_relative '../../services/api_service.rb'
 describe ApiService do
   let(:mock_conn) { instance_double(Faraday::Connection) }
   let(:mock_response) { double('Faraday::Response') }
+
+  after do
+    ApiService.instance_variable_set(:@conn, nil)
+  end
   context ".connection" do
     it 'returns a Faraday connection' do
       allow(Faraday).to receive(:new).with(url: 'http://backend:3001').and_return(mock_conn)

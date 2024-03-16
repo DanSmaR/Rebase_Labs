@@ -4,6 +4,11 @@ require 'faraday'
 require 'json'
 
 RSpec.describe 'User visits search page', type: :feature, js: true do
+
+  after do
+    ApiService.instance_variable_set(:@conn, nil)
+  end
+
   it 'and search for a exam by token successfully' do
     conn = instance_double(Faraday::Connection)
     allow(Faraday).to receive(:new).and_return(conn)
@@ -77,9 +82,12 @@ RSpec.describe 'User visits search page', type: :feature, js: true do
   end
 
   it 'and sees an error message when the token is not found' do
-    conn = instance_double(Faraday::Connection)
-    allow(Faraday).to receive(:new).and_return(conn)
-    allow(conn).to receive(:get).with('tests/blablabla').and_return(double(body: [].to_json))
+    mock_conn = instance_double(Faraday::Connection)
+    mock_response = instance_double(Faraday::Response)
+
+    allow(ApiService).to receive(:connection).and_return(mock_conn)
+    allow(ApiService).to receive(:get_exam_by_token).with(mock_conn, 'blablabla').and_return(mock_response)
+    allow(mock_response).to receive(:body).and_return([].to_json)
 
     visit '/search'
 
