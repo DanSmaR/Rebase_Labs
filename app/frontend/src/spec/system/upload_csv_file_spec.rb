@@ -49,9 +49,9 @@ RSpec.describe 'User sends csv file', type: :feature, js: true do
 
   context "when an error occurs in the server" do
     it 'and sees an error message' do
-      conn = instance_double(Faraday::Connection)
-      allow(Faraday).to receive(:new).and_return(conn)
-      allow(conn).to receive(:post).with('import', anything).and_raise(Faraday::ServerError)
+      mock_conn = instance_double(Faraday::Connection)
+      allow(ApiService).to receive(:connection).and_return(mock_conn)
+      allow(ApiService).to receive(:send_file).and_raise(Faraday::ConnectionFailed)
 
       visit '/'
 
