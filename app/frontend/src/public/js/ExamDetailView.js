@@ -21,15 +21,14 @@ export default class extends AbstractView {
 
           fragment.appendChild(descriptionList);
           fragment.appendChild(tableTests);
-          
-          resolve(fragment);
         })
         .catch((error) => {
-          console.log(error);
-          window.notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
-          window.notice.classList.add('alert', 'alert-danger');
-          window.notice.innerText = 'Não foi possível completar sua ação. Tente novamente';
-        });
+          console.error(error);
+          notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+          notice.classList.add('alert', 'alert-danger');
+          notice.innerText = 'Não foi possível completar sua ação. Tente novamente';
+        })
+        .finally(() => resolve(fragment));
     })
   }
 
