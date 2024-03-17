@@ -4,10 +4,16 @@ require 'faraday'
 require 'json'
 
 RSpec.describe 'User visits exams page', type: :feature, js: true do
+  after do
+    ApiService.instance_variable_set(:@conn, nil)
+  end
   it 'and see all exams successfully' do
-    conn = instance_double(Faraday::Connection)
-    allow(Faraday).to receive(:new).and_return(conn)
-    allow(conn).to receive(:get).with('tests').and_return(double(body: api_response.to_json))
+    mock_conn = instance_double(Faraday::Connection)
+    mock_response = instance_double(Faraday::Response)
+
+    allow(ApiService).to receive(:connection).and_return(mock_conn)
+    allow(ApiService).to receive(:get_exams).with(mock_conn).and_return(mock_response)
+    allow(mock_response).to receive(:body).and_return(api_response.to_json)
 
     visit '/'
     click_link 'Exames'
@@ -52,4 +58,21 @@ RSpec.describe 'User visits exams page', type: :feature, js: true do
     expect(page).to have_content('Maria Helena Ramalho')
     expect(page).to have_content('B0002IQM66')
   end
+
+  context "when server error occurs" do
+    it "sees an error message" do
+      mock_conn = instance_double(Faraday::Connection)
+
+      allow(ApiService).to receive(:connection).and_return(mock_conn)
+      allow(ApiService).to receive(:get_exams).with(mock_conn).and_raise(Faraday::ConnectionFailed)
+
+      visit '/'
+      click_link 'Exames'
+
+      expect(page).to have_content 'Não foi possível completar sua ação. Tente novamente'
+
+    end
+
+  end
+
 end

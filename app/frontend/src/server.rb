@@ -1,13 +1,17 @@
 require 'rack/handler/puma'
 require 'sinatra'
-require 'faraday'
-require 'faraday/multipart'
+require_relative './services/upload_csv_service.rb'
+require_relative './services/api_service.rb'
 
 get '/' do
   erb :index
 end
 
 get '/exams' do
+  erb :index
+end
+
+get '/exams/' do
   erb :index
 end
 
@@ -23,16 +27,23 @@ end
 get '/data' do
   content_type :json
 
-  conn = Faraday.new(url: 'http://backend:3001') do |builder|
-    builder.response :raise_error
+  begin
+    conn = ApiService.connection
+
+    if params[:token]
+      response = ApiService.get_exam_by_token(conn, params[:token])
+    else
+      response = ApiService.get_exams(conn)
+    end
+  rescue Faraday::ServerError, Faraday::Connection, Faraday::ConnectionFailed => e
+    puts '------------- Frontend Error GET /data ---------------'
+    puts e
+
+    status 500
+    return { error: true,  message: 'An error has occurred. Try again' }.to_json
   end
 
-  if params[:token]
-    response = conn.get("tests/#{params[:token]}")
-  else
-    response = conn.get('tests')
-  end
-
+  status 200
   response.body
 end
 
@@ -40,39 +51,34 @@ end
 post '/upload' do
   content_type :json
 
-  unless params[:csvFile] && params[:csvFile] != 'undefined' &&
-    (tmpfile = params[:csvFile][:tempfile]) &&
-    (name = params[:csvFile][:filename])
+  validation_result = UploadCSVService.validate(params[:csvFile])
 
+  unless validation_result[:success]
     status 400
-    return { success: false, message: 'No file was uploaded' }.to_json
-  end
-
-  unless name.match?(/\.csv\z/)
-    status 400
-    return { success: false, message: 'Invalid file format' }.to_json
+    return validation_result.to_json
   end
 
   begin
-    conn = Faraday.new(url: 'http://backend:3001') do |builder|
-      builder.request :multipart
-      builder.request :url_encoded
-      builder.adapter :net_http
-    end
+    conn = ApiService.connection
 
-    payload = { file: Faraday::Multipart::FilePart.new(tmpfile, 'text/csv') }
+    payload = UploadCSVService.create_payload(validation_result[:tmpfile])
 
-    response = conn.post('import', payload)
+    ApiService.send_file(conn, payload)
 
-    if response.status == 200
-        status 200
-        { success: true, message: 'Data imported successfully' }.to_json
-    end
-  rescue => e
-    puts e.message
+    status 200
+    { success: true, message: 'Data imported successfully' }.to_json
+
+  rescue Faraday::ServerError, Faraday::Connection, Faraday::ConnectionFailed => e
+    puts e
 
     status 500
-    { error: true,  message: 'An error occurred while importing data. Try again' }.to_json
+    return { error: true,  message: 'An error has occurred. Try again' }.to_json
+
+  rescue Faraday::BadRequestError => e
+    puts e
+
+    status 400
+    return { sucess: false, message: 'No file was uploaded' }.to_json
   end
 end
 

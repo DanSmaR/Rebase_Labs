@@ -28,6 +28,8 @@ get '/tests/:token' do
   end
 
   response.to_json
+
+  # TODO - Retornar 404 se vier vazio a busca por token
 end
 
 post '/import' do

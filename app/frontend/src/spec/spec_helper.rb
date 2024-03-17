@@ -31,7 +31,6 @@ end
 Capybara.javascript_driver = :selenium
 # Capybara.default_max_wait_time = 2
 
-Capybara.app = Sinatra::Application
 Capybara.run_server = true
 Capybara.server_port = 9292
 

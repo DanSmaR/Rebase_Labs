@@ -82,34 +82,29 @@ importCSVBtn.addEventListener('click', (ev) => {
   const formData = new FormData();
 
   formData.append('csvFile', file);
-
+  
+  notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+  
   fetch('/upload', {
     method: 'POST',
     body: formData
   })
-  .then(response => response.json())
+  .then((response) => {
+    if (response.status === 500) throw new Error('An error has ocurred. Try again');
+    return response.json();
+  })
   .then(data => {
+    fileInput.value = '';
     if (data.success) {
-      fileInput.value = '';
-      notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
       notice.classList.add('alert', 'alert-success');
       notice.innerText = 'Arquivo enviado com sucesso!';
-    } else if (data.success === false) {
-      fileInput.value = '';
-      notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+    } else {
       notice.classList.add('alert', 'alert-warning');
       notice.innerText = 'Arquivo não selecionado ou inválido!'
-    } else if (data.error) {
-      fileInput.value = '';
-      notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
-      notice.classList.add('alert', 'alert-danger');
-      notice.innerText = 'Erro ao enviar arquivo! Tente novamente.';
     }
   })
   .catch(error => {
-    fileInput.value = '';
-    console.error('Error:', error);
-    notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+    console.error('Error:', error.message);
     notice.classList.add('alert', 'alert-danger');
     notice.innerText = 'Erro ao enviar arquivo! Tente novamente.';
   });

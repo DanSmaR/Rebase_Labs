@@ -9,9 +9,6 @@ export default class extends AbstractView {
   }
 
   getHtml() {
-    // const notice = document.getElementById('notice');
-    // notice.role = 'alert'
-
     const fragment = new DocumentFragment();
     const article = document.createElement('article');
     article.classList.add('exam-data');
@@ -51,7 +48,10 @@ export default class extends AbstractView {
 
       if (token) {
         fetch(this.URL + `?token=${token}`)
-          .then((response) => response.json())
+          .then((response) => {
+            if (response.status === 500) throw new Error('An error has ocurred. Try again');
+            return response.json();
+          })
           .then((data) => {
             if (data.length == 0) {
               notice.classList.add('alert', 'alert-warning');
@@ -65,8 +65,7 @@ export default class extends AbstractView {
             }
           })
           .catch(error => {
-            console.error(error);
-            notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
+            console.error(error.message);
             notice.classList.add('alert', 'alert-danger');
             notice.innerText = 'Não foi possível completar sua ação. Tente novamente';
           });
