@@ -73,7 +73,7 @@ post '/import' do
     puts e.message
 
     status 500
-    { error: true,  message: 'An error occurred while importing data. Try again' }.to_json
+    { error: true,  message: 'An error has occurred. Try again' }.to_json
   end
 end
 
