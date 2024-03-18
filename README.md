@@ -154,7 +154,11 @@ To run the tests, you need to access the specific containers as described above.
 cd src && bundle exec rspec
 ```
 
-## Making Requests to the /tests Endpoint
+# API
+
+## All exams
+
+### GET /tests
 
 You can make GET requests to the `/tests` endpoint to retrieve medical exams data. Here's an example using curl:
 
@@ -162,7 +166,7 @@ You can make GET requests to the `/tests` endpoint to retrieve medical exams dat
 curl http://localhost:3001/tests
 ```
 
-This will return a JSON array with the medical exams data.
+This will return a JSON array with the medical exams data and **STATUS CODE = 200**
 
 ```json
 [
@@ -229,6 +233,16 @@ This will return a JSON array with the medical exams data.
       ]
 ```
 
+And returns an empty array if there is no data in the database and **STATUS CODE = 404**
+
+```json
+[]
+```
+
+## Filtering by Token
+
+### GET /tests/:token
+
 This endpoint also accepts a `token` named parameter to filter the exams by token. Here's an example:
 
 ```sh
@@ -270,4 +284,40 @@ This will return a JSON object with the medical exam data for the token `IQCZ17`
     ]
   }
 ]
+```
+
+And returns an empty array if there is no data in the database and **STATUS CODE = 404**
+
+```json
+[]
+```
+
+## Importing csv file
+
+### POST /tests/import
+
+You can make POST requests to the `/tests/import` endpoint to import medical exams data from a csv file. Here's an example using curl:
+
+```sh
+curl -X POST -F "file=@/path/to/your/file.csv" http://localhost:3001/tests/import
+```
+
+This will return a JSON object with the message `File imported successfully` and **STATUS CODE = 200**
+
+```json
+{ success: true, message: 'Data imported successfully' }
+```
+
+And returns an error message if the file is not a csv file and **STATUS CODE = 400**
+
+```json
+{ success: false, message: 'Invalid file type. Please, upload a csv file' }
+```
+
+## Server Errors
+
+If the server encounters an error, it will return a JSON object with the error message and **STATUS CODE = 500**
+
+```json
+{ error: true,  message: 'An error has occurred. Try again' }
 ```

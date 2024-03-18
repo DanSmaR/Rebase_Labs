@@ -49,7 +49,7 @@ RSpec.describe 'Server' do
         post '/import', file: Rack::Test::UploadedFile.new(file_path, 'text/csv')
 
         expect(last_response).to be_server_error
-        expect(JSON.parse(last_response.body)).to eq({"error"=>true, "message"=>"An error occurred while importing data. Try again"})
+        expect(JSON.parse(last_response.body)).to eq({"error"=>true, "message"=>"An error has occurred. Try again"})
       end
     end
 
