@@ -1,5 +1,6 @@
 require 'rack/handler/puma'
 require 'sinatra'
+require 'faraday'
 require_relative './services/upload_csv_service.rb'
 require_relative './services/api_service.rb'
 
@@ -35,6 +36,15 @@ get '/data' do
     else
       response = ApiService.get_exams(conn)
     end
+
+    response.body
+
+  rescue Faraday::ResourceNotFound => e
+    puts '------------- Frontend Error GET /data ---------------'
+    puts e
+
+    status 404
+    return [].to_json
   rescue Faraday::ServerError, Faraday::Connection, Faraday::ConnectionFailed => e
     puts '------------- Frontend Error GET /data ---------------'
     puts e
@@ -43,8 +53,6 @@ get '/data' do
     return { error: true,  message: 'An error has occurred. Try again' }.to_json
   end
 
-  status 200
-  response.body
 end
 
 # This route is used to upload the CSV file to the backend
