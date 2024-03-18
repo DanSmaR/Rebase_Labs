@@ -1,6 +1,7 @@
 require 'rack/handler/puma'
 require 'sinatra'
 require 'fileutils'
+require 'pg'
 require_relative './database/database_setup.rb'
 require_relative './exam_data_builder.rb'
 require_relative './jobs/csv_import_job.rb'
@@ -9,27 +10,46 @@ get '/tests' do
   content_type :json
   response.headers['Access-Control-Allow-Origin'] = '*'
 
-  result = ExamDataBuilder.get_exams_from_db
+  begin
+    result = ExamDataBuilder.get_exams_from_db
 
-  response = result.group_by { |item| item['token'] }.map do |token, items|
-    ExamDataBuilder.build_exam_data(items)
+    unless result.any?
+      status 404
+      return result.to_json
+    end
+
+    response = result.group_by { |item| item['token'] }.map do |token, items|
+      ExamDataBuilder.build_exam_data(items)
+    end
+
+    response.to_json
+  rescue PG::Error => e
+    status 500
+    return { error: true,  message: 'An error has occurred. Try again' }.to_json
   end
 
-  response.to_json
 end
 
 get '/tests/:token' do
   content_type :json
 
-  result = ExamDataBuilder.get_exams_from_db(params[:token])
+  begin
+    result = ExamDataBuilder.get_exams_from_db(params[:token])
 
-  response = result.group_by { |item| item['token'] }.map do |token, items|
-    ExamDataBuilder.build_exam_data(items)
+    unless result.any?
+      status 404
+      return result.to_json
+    end
+
+    response = result.group_by { |item| item['token'] }.map do |token, items|
+      ExamDataBuilder.build_exam_data(items)
+    end
+
+    response.to_json
+  rescue PG::Error => e
+    status 500
+    return { error: true,  message: 'An error has occurred. Try again' }.to_json
   end
-
-  response.to_json
-
-  # TODO - Retornar 404 se vier vazio a busca por token
 end
 
 post '/import' do

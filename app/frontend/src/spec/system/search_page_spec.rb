@@ -85,13 +85,14 @@ RSpec.describe 'User visits search page', type: :feature, js: true do
     mock_conn = instance_double(Faraday::Connection)
     mock_response = instance_double(Faraday::Response)
 
+    token = 'foo'
+
     allow(ApiService).to receive(:connection).and_return(mock_conn)
-    allow(ApiService).to receive(:get_exam_by_token).with(mock_conn, 'blablabla').and_return(mock_response)
-    allow(mock_response).to receive(:body).and_return([].to_json)
+    allow(ApiService).to receive(:get_exam_by_token).with(mock_conn, token).and_raise(Faraday::ResourceNotFound)
 
     visit '/search'
 
-    fill_in 'token', with: 'blablabla'
+    fill_in 'token', with: token
     click_button 'Pesquisar'
 
     expect(page).to have_content 'Exame não encontrado.'

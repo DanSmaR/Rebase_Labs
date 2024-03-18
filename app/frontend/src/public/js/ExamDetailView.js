@@ -13,14 +13,20 @@ export default class extends AbstractView {
       fetch(this.URL + `?token=${this.params.token}`)
         .then((response) => {
           if (response.status === 500) throw new Error('An error has ocurred. Try again');
+          if (response.status == 404) {
+            notice.classList.add('alert', 'alert-warning');
+            notice.innerText = 'Exame não encontrado.'
+          }
           return response.json();
         })
         .then((data) => {
-          const descriptionList = this.createExamsDescriptionList(data);
-          const tableTests = this.createTestsTable(data);
-
-          fragment.appendChild(descriptionList);
-          fragment.appendChild(tableTests);
+          if (data.length) {
+            const descriptionList = this.createExamsDescriptionList(data);
+            const tableTests = this.createTestsTable(data);
+  
+            fragment.appendChild(descriptionList);
+            fragment.appendChild(tableTests);
+          }
         })
         .catch((error) => {
           console.error(error);

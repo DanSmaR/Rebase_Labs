@@ -15,14 +15,20 @@ export default class extends AbstractView {
     return new Promise((resolve, _reject) => {
       fetch(this.URL)
         .then((response) => {
+          if (response.status === 404) {
+            notice.classList.add('alert', 'alert-warning');
+            notice.innerText = 'Não há exames cadastrados.'
+            return response.json();
+          }
           if (response.status === 500) throw new Error('An error has ocurred. Try again');
           return response.json();
         })
         .then((data) => {
-          const table = this.createTable(data);
-
-          fragment.appendChild(heading1);
-          fragment.appendChild(table);
+          if (data.length) {
+            const table = this.createTable(data);
+            fragment.appendChild(heading1);
+            fragment.appendChild(table);
+          }
         })
         .catch((error) => {
           console.error(error.message);
