@@ -50,13 +50,14 @@ export default class extends AbstractView {
         fetch(this.URL + `?token=${token}`)
           .then((response) => {
             if (response.status === 500) throw new Error('An error has ocurred. Try again');
+            if (response.status == 404) {
+              notice.classList.add('alert', 'alert-warning');
+              notice.innerText = 'Exame não encontrado.'
+            }
             return response.json();
           })
           .then((data) => {
-            if (data.length == 0) {
-              notice.classList.add('alert', 'alert-warning');
-              notice.innerText = 'Exame não encontrado.'
-            } else {
+            if (data.length) {
               const descriptionList = this.examDetailView.createExamsDescriptionList(data);
               const tableTests = this.examDetailView.createTestsTable(data);
               article.appendChild(descriptionList)
