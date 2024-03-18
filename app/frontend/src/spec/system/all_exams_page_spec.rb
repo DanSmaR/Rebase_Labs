@@ -7,6 +7,7 @@ RSpec.describe 'User visits exams page', type: :feature, js: true do
   after do
     ApiService.instance_variable_set(:@conn, nil)
   end
+
   it 'and see all exams successfully' do
     mock_conn = instance_double(Faraday::Connection)
     mock_response = instance_double(Faraday::Response)
@@ -14,6 +15,7 @@ RSpec.describe 'User visits exams page', type: :feature, js: true do
     allow(ApiService).to receive(:connection).and_return(mock_conn)
     allow(ApiService).to receive(:get_exams).with(mock_conn).and_return(mock_response)
     allow(mock_response).to receive(:body).and_return(api_response.to_json)
+    allow(mock_response).to receive(:status).and_return(200)
 
     visit '/'
     click_link 'Exames'
@@ -31,7 +33,7 @@ RSpec.describe 'User visits exams page', type: :feature, js: true do
 
     expect(page).to have_content('Exames Médicos')
 
-    expect(page).to have_content('Token')
+    expect(page).to have_content('Token', count: 2)
     expect(page).to have_content('Data do Exame')
     expect(page).to have_content('CPF')
     expect(page).to have_content('Nome')
@@ -59,6 +61,30 @@ RSpec.describe 'User visits exams page', type: :feature, js: true do
     expect(page).to have_content('B0002IQM66')
   end
 
+  context "when there is no exam registered" do
+    it "shows a alert message" do
+      mock_conn = instance_double(Faraday::Connection)
+
+      allow(ApiService).to receive(:connection).and_return(mock_conn)
+      allow(ApiService).to receive(:get_exams).with(mock_conn).and_raise(Faraday::ResourceNotFound)
+
+      visit '/exams'
+
+      expect(page).to have_content 'Não há exames cadastrados.'
+
+      expect(page).to_not have_content('Exames Médicos')
+
+      expect(page).to have_content('Token', count: 1)
+      expect(page).to_not have_content('Data do Exame')
+      expect(page).to_not have_content('CPF')
+      expect(page).to_not have_content('Nome')
+      expect(page).to_not have_content('Cidade')
+      expect(page).to_not have_content('Estado')
+      expect(page).to_not have_content('Nome do Médico')
+      expect(page).to_not have_content('CRM do Médico')
+    end
+  end
+
   context "when server error occurs" do
     it "sees an error message" do
       mock_conn = instance_double(Faraday::Connection)
@@ -70,7 +96,6 @@ RSpec.describe 'User visits exams page', type: :feature, js: true do
       click_link 'Exames'
 
       expect(page).to have_content 'Não foi possível completar sua ação. Tente novamente'
-
     end
 
   end
