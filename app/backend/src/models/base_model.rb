@@ -10,4 +10,8 @@ class BaseModel
       # Statement already prepared, do nothing
     end
   end
+
+  def self.count(conn)
+    result = conn.exec(self::COUNT_STATEMENT)
+  end
 end

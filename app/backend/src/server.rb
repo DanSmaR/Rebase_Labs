@@ -5,22 +5,35 @@ require 'pg'
 require_relative './database/database_setup.rb'
 require_relative './exam_data_builder.rb'
 require_relative './jobs/csv_import_job.rb'
+require_relative './middleware/pagination_middleware.rb'
+
+use PaginationMiddleware
 
 get '/tests' do
   content_type :json
   response.headers['Access-Control-Allow-Origin'] = '*'
 
   begin
-    result = ExamDataBuilder.get_exams_from_db
+    results = env['results']
 
-    unless result.any?
+    unless results.any?
       status 404
-      return result.to_json
+      return {
+        "previous" => nil,
+        "next" => nil,
+        "results" => results
+    }.to_json
     end
 
-    response = result.group_by { |item| item['token'] }.map do |token, items|
+    exams = results.group_by { |item| item['token'] }.map do |token, items|
       ExamDataBuilder.build_exam_data(items)
     end
+
+    response = {
+      previous: env['previous'],
+      next: env['next'],
+      results: exams
+    }
 
     response.to_json
   rescue PG::Error => e
@@ -32,16 +45,17 @@ end
 
 get '/tests/:token' do
   content_type :json
+  response.headers['Access-Control-Allow-Origin'] = '*'
 
   begin
-    result = ExamDataBuilder.get_exams_from_db(params[:token])
+    results = env['results']
 
-    unless result.any?
+    unless results.any?
       status 404
-      return result.to_json
+      return results.to_json
     end
 
-    response = result.group_by { |item| item['token'] }.map do |token, items|
+    response = results.group_by { |item| item['token'] }.map do |token, items|
       ExamDataBuilder.build_exam_data(items)
     end
 
@@ -54,6 +68,7 @@ end
 
 post '/import' do
   content_type :json
+  response.headers['Access-Control-Allow-Origin'] = '*'
 
   begin
     if params[:file] && (tempfile = params[:file][:tempfile])

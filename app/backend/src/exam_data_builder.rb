@@ -1,22 +1,32 @@
 require_relative './database/db_manager.rb'
 
 class ExamDataBuilder
-  QUERY = <<~SQL.gsub("\n", " ")
-    SELECT p.*, d.*, e.*, t.*
-    FROM exams e
-    JOIN patients p ON p.cpf = e.patient_cpf
-    JOIN doctors d ON d.crm = e.doctor_crm
-    JOIN tests t ON t.exam_token = e.token
-  SQL
+  QUERY = [
+    'SELECT p.*, d.*, e.*, t.* ',
+    'FROM exams e ',
+    'FROM (SELECT * FROM exams LIMIT $1 OFFSET $2) e ',
+    'JOIN patients p ON p.cpf = e.patient_cpf JOIN doctors d ON d.crm = e.doctor_crm ',
+    'JOIN tests t ON t.exam_token = e.token'
+  ]
 
-  def self.get_exams_from_db(*params)
-    final_query = params.any? ? "#{QUERY} WHERE e.token = $1;" : "#{QUERY};"
+  def self.get_exams_from_db(token: '', limit: nil, offset: nil)
+    if !token.empty?
+      final_query = "#{QUERY[0] + QUERY[1] + QUERY[3] + QUERY[4] } WHERE e.token = $1;"
+      params = [token]
+    elsif offset && limit
+      final_query = "#{QUERY[0] + QUERY[2] + QUERY[3] + QUERY[4]} ORDER BY e.exam_date DESC;"
+      params = [limit, offset]
+    else
+      final_query = "#{QUERY[0] + QUERY[1] + QUERY[3] + QUERY[4]} ORDER BY e.exam_date DESC;"
+      params = []
+    end
+
     result = DBManager.conn.exec_params(final_query, params)
     result.map { |row| row }
   end
 
   def self.build_exam_data(items)
-    {
+    data = {
       'token' => items.first['token'],
       'exam_date' => items.first['exam_date'],
       'cpf' => items.first['cpf'],
