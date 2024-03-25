@@ -54,7 +54,7 @@ const router = () => {
   
   view.getHtml()
     .then(html => {
-      app = document.querySelector("#app");
+      const app = document.querySelector("#app");
       while (app.firstChild) {
         app.removeChild(app.firstChild);
       }
