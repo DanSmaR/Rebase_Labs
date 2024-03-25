@@ -31,8 +31,6 @@ export default class extends AbstractView {
       notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
       notice.innerText = "";
       
-      app = document.querySelector("#app");
-      
       const examData = document.querySelector('.exam-data');
 
       if (examData) {
