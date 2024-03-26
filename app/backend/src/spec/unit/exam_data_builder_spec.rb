@@ -1,5 +1,6 @@
 require_relative '../spec_helper.rb'
 require_relative '../../exam_data_builder.rb'
+require_relative '../support/test_data.rb'
 
 RSpec.describe ExamDataBuilder do
   let(:items) do
@@ -25,7 +26,7 @@ RSpec.describe ExamDataBuilder do
     ]
   end
 
-  describe '.build_exam_data' do
+  context '.build_exam_data' do
     it 'builds exam data from items' do
       result = ExamDataBuilder.build_exam_data(items)
       expect(result).to be_a(Hash)
@@ -43,7 +44,7 @@ RSpec.describe ExamDataBuilder do
     end
   end
 
-  describe '.build_doctor_data' do
+  context '.build_doctor_data' do
     it 'builds doctor data from items' do
       result = ExamDataBuilder.build_doctor_data(items)
       expect(result).to be_a(Hash)
@@ -54,13 +55,56 @@ RSpec.describe ExamDataBuilder do
     end
   end
 
-  describe '.build_exam_tests' do
+  context '.build_exam_tests' do
     it 'builds exam tests from items' do
       result = ExamDataBuilder.build_exam_tests(items)
       expect(result).to be_a(Array)
       expect(result.first['type']).to eq('hemácias')
       expect(result.first['limits']).to eq('45-52')
       expect(result.first['result']).to eq('97')
+    end
+  end
+
+  context '.get_exams_from_db' do
+    let(:query) {
+      <<~SQL.gsub("\n", " ")
+        SELECT p.*, d.*, e.*, t.*
+        FROM exams e
+        JOIN patients p ON p.cpf = e.patient_cpf
+        JOIN doctors d ON d.crm = e.doctor_crm
+        JOIN tests t ON t.exam_token = e.token
+      SQL
+    }
+    let(:mock_conn) { instance_double(PG::Connection) }
+
+    before do
+      allow(DBManager).to receive(:conn).and_return(mock_conn)
+    end
+    it 'returns all exams data from DB' do
+      final_query = "#{query};"
+
+      allow(mock_conn).to receive(:exec_params).with(final_query, []).and_return(db_result)
+
+      results = ExamDataBuilder.get_exams_from_db
+
+      expect(results).to eq db_result
+    end
+
+    it "returns one exam by token" do
+      final_query = "#{query} WHERE e.token = $1;"
+      token = '0W9I67'
+
+      allow(mock_conn).to receive(:exec_params).with(final_query, [token]).and_return(db_result[2..3])
+
+      results = ExamDataBuilder.get_exams_from_db(token)
+
+      expect(results).to eq db_result[2..3]
+    end
+
+    it 'raises a DatabaseError when a PG::Error is raised' do
+      allow(mock_conn).to receive(:exec_params).and_raise(PG::Error.new('An error occurred'))
+
+      expect { ExamDataBuilder.get_exams_from_db }.to raise_error(DataBaseError, 'An error occurred')
     end
   end
 end

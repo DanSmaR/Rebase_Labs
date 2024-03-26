@@ -1,4 +1,5 @@
 require_relative './database/db_manager.rb'
+require_relative './errors/database_error.rb'
 
 class ExamDataBuilder
   QUERY = <<~SQL.gsub("\n", " ")
@@ -10,9 +11,21 @@ class ExamDataBuilder
   SQL
 
   def self.get_exams_from_db(*params)
-    final_query = params.any? ? "#{QUERY} WHERE e.token = $1;" : "#{QUERY};"
-    result = DBManager.conn.exec_params(final_query, params)
-    result.map { |row| row }
+    if params.any?
+      final_query = "#{QUERY} WHERE e.token = $1;"
+    else
+      final_query = "#{QUERY};"
+      params = []
+    end
+
+    begin
+      result = DBManager.conn.exec_params(final_query, params)
+      result.map { |row| row }
+
+    rescue PG::Error => e
+      puts e.message
+      raise DataBaseError, e.message
+    end
   end
 
   def self.build_exam_data(items)

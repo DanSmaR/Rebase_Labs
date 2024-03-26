@@ -5,7 +5,7 @@ require_relative '../support/test_data.rb'
 
 RSpec.describe 'Server' do
   describe 'GET /tests' do
-    let(:mock_conn) { double('PG::Connection') }
+    let(:mock_conn) { instance_double(PG::Connection) }
     let(:test_query) {
       <<~SQL.gsub("\n", " ")
         SELECT p.*, d.*, e.*, t.*
