@@ -7,7 +7,9 @@ require_relative '../models/exam_model.rb'
 require_relative '../models/test_model.rb'
 
 class DatabaseSetup
-  CSV_FILE_PATH = 'src/data/data.csv'
+  CSV_FILE_PATH = File.expand_path(
+    ENV['RACK_ENV'] == 'test' ? '../spec/support/data.csv' : '../data/data.csv', __dir__
+  )
   MODELS = [PatientModel, DoctorModel, ExamModel, TestModel]
 
   def self.seed(conn)
@@ -34,5 +36,11 @@ class DatabaseSetup
     end
 
     puts 'Done'
+  end
+
+  def self.clean(conn)
+    MODELS.reverse.each do |model|
+      model.exec_delete_all(conn)
+    end
   end
 end

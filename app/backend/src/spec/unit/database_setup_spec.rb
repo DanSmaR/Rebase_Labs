@@ -8,7 +8,7 @@ require_relative '../../models/test_model.rb'
 
 describe DatabaseSetup do
   let(:mock_conn) { double('PG::Connection') }
-  let(:test_file_path) { 'src/data/data.csv' }
+  let(:test_file_path) { '/usr/src/app/backend/src/spec/support/data.csv' }
 
   before do
     allow(DBManager).to receive(:conn).and_return(mock_conn)

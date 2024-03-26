@@ -10,4 +10,8 @@ class BaseModel
       # Statement already prepared, do nothing
     end
   end
+
+  def self.exec_delete_all(conn)
+    conn.exec("DELETE FROM #{self.name.downcase.gsub('model', 's')}")
+  end
 end
