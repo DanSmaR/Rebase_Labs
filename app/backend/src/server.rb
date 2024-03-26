@@ -4,51 +4,41 @@ require 'fileutils'
 require 'pg'
 require_relative './database/database_setup.rb'
 require_relative './exam_data_builder.rb'
+require_relative './services/exam_service.rb'
 require_relative './jobs/csv_import_job.rb'
+require_relative './errors/database_error.rb'
+
+exam_service = ExamService.new(ExamDataBuilder)
 
 get '/tests' do
   content_type :json
   response.headers['Access-Control-Allow-Origin'] = '*'
 
   begin
-    result = ExamDataBuilder.get_exams_from_db
+    results = exam_service.get_exams
 
-    unless result.any?
-      status 404
-      return result.to_json
-    end
+    status results.any? ? 200 : 404
+    results.to_json
 
-    response = result.group_by { |item| item['token'] }.map do |token, items|
-      ExamDataBuilder.build_exam_data(items)
-    end
-
-    response.to_json
-  rescue PG::Error => e
+  rescue DataBaseError => e
     status 500
-    return { error: true,  message: 'An error has occurred. Try again' }.to_json
+    { error: true,  message: 'An error has occurred. Try again' }.to_json
   end
-
 end
 
 get '/tests/:token' do
   content_type :json
+  response.headers['Access-Control-Allow-Origin'] = '*'
 
   begin
-    result = ExamDataBuilder.get_exams_from_db(params[:token])
+    results = exam_service.get_exams(params[:token])
 
-    unless result.any?
-      status 404
-      return result.to_json
-    end
+    status results.any? ? 200 : 404
+    results.to_json
 
-    response = result.group_by { |item| item['token'] }.map do |token, items|
-      ExamDataBuilder.build_exam_data(items)
-    end
-
-    response.to_json
-  rescue PG::Error => e
+  rescue
     status 500
-    return { error: true,  message: 'An error has occurred. Try again' }.to_json
+    { error: true,  message: 'An error has occurred. Try again' }.to_json
   end
 end
 

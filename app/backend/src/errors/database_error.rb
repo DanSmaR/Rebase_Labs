@@ -1,0 +1,1 @@
+class DataBaseError < StandardError; end
