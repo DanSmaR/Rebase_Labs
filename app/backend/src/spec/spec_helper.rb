@@ -17,6 +17,7 @@ require 'rack/test'
 require 'rspec'
 
 ENV['RACK_ENV'] = 'test'
+ENV['DB_TEST_URL'] = 'postgres://postgres:password@db:5432/medical_exams_test'
 require_relative '../server.rb'
 
 def app
@@ -25,6 +26,7 @@ end
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
