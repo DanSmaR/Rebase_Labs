@@ -7,6 +7,8 @@ class DoctorModel < BaseModel
     ON CONFLICT (crm) DO NOTHING
   SQL
 
+  COUNT_STATEMENT = "SELECT COUNT(crm) FROM doctors;"
+
   def self.prepare_data(data)
     [
       data['crm médico'],

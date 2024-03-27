@@ -46,4 +46,14 @@ describe ExamModel do
 
     ExamModel.exec_insert(mock_conn, csv_row_data)
   end
+
+  it '.count' do
+    COUNT_STATEMENT = "SELECT COUNT(token) FROM exams;"
+
+    mock_pg_result = instance_double(PG::Result)
+
+    allow(mock_conn).to receive(:exec).with(COUNT_STATEMENT).and_return(mock_pg_result)
+
+    ExamModel.count(mock_conn)
+  end
 end

@@ -7,6 +7,8 @@ class PatientModel < BaseModel
     ON CONFLICT (cpf) DO NOTHING
   SQL
 
+  COUNT_STATEMENT = "SELECT COUNT(cpf) FROM patients;"
+
   def self.prepare_data(data)
     [
       data['cpf'],
