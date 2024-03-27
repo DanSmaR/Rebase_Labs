@@ -1,4 +1,5 @@
 require_relative './database/db_manager.rb'
+require_relative './errors/database_error.rb'
 
 class ExamDataBuilder
   QUERY = [
@@ -21,8 +22,14 @@ class ExamDataBuilder
       params = []
     end
 
-    result = DBManager.conn.exec_params(final_query, params)
-    result.map { |row| row }
+    begin
+      result = DBManager.conn.exec_params(final_query, params)
+      result.map { |row| row }
+
+    rescue PG::Error => e
+      puts e.message
+      raise DataBaseError, e.message
+    end
   end
 
   def self.build_exam_data(items)

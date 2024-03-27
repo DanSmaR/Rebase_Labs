@@ -4,6 +4,7 @@ require 'fileutils'
 require 'pg'
 require_relative './database/database_setup.rb'
 require_relative './exam_data_builder.rb'
+require_relative './services/exam_service.rb'
 require_relative './jobs/csv_import_job.rb'
 require_relative './middleware/pagination_middleware.rb'
 
@@ -38,9 +39,8 @@ get '/tests' do
     response.to_json
   rescue PG::Error => e
     status 500
-    return { error: true,  message: 'An error has occurred. Try again' }.to_json
+    { error: true,  message: 'An error has occurred. Try again' }.to_json
   end
-
 end
 
 get '/tests/:token' do
@@ -62,7 +62,7 @@ get '/tests/:token' do
     response.to_json
   rescue PG::Error => e
     status 500
-    return { error: true,  message: 'An error has occurred. Try again' }.to_json
+    { error: true,  message: 'An error has occurred. Try again' }.to_json
   end
 end
 

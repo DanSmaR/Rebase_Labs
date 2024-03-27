@@ -14,4 +14,8 @@ class BaseModel
   def self.count(conn)
     result = conn.exec(self::COUNT_STATEMENT)
   end
+
+  def self.exec_delete_all(conn)
+    conn.exec("DELETE FROM #{self.name.downcase.gsub('model', 's')}")
+  end
 end

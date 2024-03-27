@@ -112,6 +112,10 @@ RSpec.describe ExamDataBuilder do
       results = ExamDataBuilder.get_exams_from_db(limit:, offset:)
 
       expect(results).to eq db_result[4..]
+    it 'raises a DatabaseError when a PG::Error is raised' do
+      allow(mock_conn).to receive(:exec_params).and_raise(PG::Error.new('An error occurred'))
+
+      expect { ExamDataBuilder.get_exams_from_db }.to raise_error(DataBaseError, 'An error occurred')
     end
   end
 end
