@@ -26,7 +26,7 @@ RSpec.describe ExamDataBuilder do
     ]
   end
 
-  context '.build_exam_data' do
+  describe '.build_exam_data' do
     it 'builds exam data from items' do
       result = ExamDataBuilder.build_exam_data(items)
       expect(result).to be_a(Hash)
@@ -44,7 +44,7 @@ RSpec.describe ExamDataBuilder do
     end
   end
 
-  context '.build_doctor_data' do
+  describe '.build_doctor_data' do
     it 'builds doctor data from items' do
       result = ExamDataBuilder.build_doctor_data(items)
       expect(result).to be_a(Hash)
@@ -55,7 +55,7 @@ RSpec.describe ExamDataBuilder do
     end
   end
 
-  context '.build_exam_tests' do
+  describe '.build_exam_tests' do
     it 'builds exam tests from items' do
       result = ExamDataBuilder.build_exam_tests(items)
       expect(result).to be_a(Array)
@@ -65,7 +65,7 @@ RSpec.describe ExamDataBuilder do
     end
   end
 
-  context '.get_exams_from_db' do
+  describe '.get_exams_from_db' do
     let(:query) {
       [
         'SELECT p.*, d.*, e.*, t.* ',
@@ -81,7 +81,7 @@ RSpec.describe ExamDataBuilder do
       allow(DBManager).to receive(:conn).and_return(mock_conn)
     end
     it 'returns all exams data from DB' do
-      final_query = "#{query[0] + query[1] + query[3] + query[4]} ORDER BY e.exam_date DESC;"
+      final_query = "#{query[0] + query[1] + query[3] + query[4]} ORDER BY e.exam_date DESC, t.exam_type;"
 
       allow(mock_conn).to receive(:exec_params).with(final_query, []).and_return(db_result)
 
@@ -102,7 +102,7 @@ RSpec.describe ExamDataBuilder do
     end
 
     it 'returns a slice of exams when given an offset and limit as arguments' do
-      final_query = "#{query[0] + query[2] + query[3] + query[4]} ORDER BY e.exam_date DESC;"
+      final_query = "#{query[0] + query[2] + query[3] + query[4]} ORDER BY e.exam_date DESC, t.exam_type;"
       limit = 2
       offset = 2
       params = [limit, offset]
@@ -112,6 +112,8 @@ RSpec.describe ExamDataBuilder do
       results = ExamDataBuilder.get_exams_from_db(limit:, offset:)
 
       expect(results).to eq db_result[4..]
+    end
+
     it 'raises a DatabaseError when a PG::Error is raised' do
       allow(mock_conn).to receive(:exec_params).and_raise(PG::Error.new('An error occurred'))
 

@@ -1,27 +1,32 @@
 require_relative '../exam_data_builder.rb'
 require_relative '../models/exam_model.rb'
+require_relative '../services/exam_service.rb'
 
 class PaginationMiddleware
-  def initialize(app)
+  def initialize(app, exam_model, exam_service)
     @app = app
+    @exam_model = exam_model
+    @exam_service = exam_service
   end
 
   def call(env)
     request = Rack::Request.new(env)
-    token = ""
 
     unless request.path == '/import'
+      token = ''
 
       if request.params['page'] && request.params['limit']
         page = (request.params['page']).to_i
         limit = (request.params['limit']).to_i
 
         offset =  (page - 1) * limit
-        endIndex = page * limit
+        end_index = page * limit
+        exams_count = @exam_model.count(DBManager.conn).to_a[0]['count'].to_i
+        total_pages = exams_count.to_f / limit
 
-        examsCount = ExamModel.count(DBManager.conn).to_a[0]['count'].to_i
+        env['total_pages'] = total_pages.ceil
 
-        if endIndex < examsCount
+        if end_index < exams_count
           env['next'] = {
             page: page + 1,
             limit:
@@ -38,13 +43,11 @@ class PaginationMiddleware
         token = request.path.split('/')[2].to_s
       end
 
-      env['has_token'] = !token.empty? ? true : false
-
-      env['results'] = ExamDataBuilder.get_exams_from_db(token:, limit:, offset:)
+      env['results'] = @exam_service.get_exams(token:, limit:, offset:)
     end
 
     @app.call(env)
-  rescue PG::Error => e
+  rescue DataBaseError => e
     [500, { "Content-Type" => "application/json" }, { error: true,  message: 'An error has occurred. Try again' }.to_json]
   end
 end

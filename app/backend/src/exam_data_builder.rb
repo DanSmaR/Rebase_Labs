@@ -15,10 +15,10 @@ class ExamDataBuilder
       final_query = "#{QUERY[0] + QUERY[1] + QUERY[3] + QUERY[4] } WHERE e.token = $1;"
       params = [token]
     elsif offset && limit
-      final_query = "#{QUERY[0] + QUERY[2] + QUERY[3] + QUERY[4]} ORDER BY e.exam_date DESC;"
+      final_query = "#{QUERY[0] + QUERY[2] + QUERY[3] + QUERY[4]} ORDER BY e.exam_date DESC, t.exam_type;"
       params = [limit, offset]
     else
-      final_query = "#{QUERY[0] + QUERY[1] + QUERY[3] + QUERY[4]} ORDER BY e.exam_date DESC;"
+      final_query = "#{QUERY[0] + QUERY[1] + QUERY[3] + QUERY[4]} ORDER BY e.exam_date DESC, t.exam_type;"
       params = []
     end
 

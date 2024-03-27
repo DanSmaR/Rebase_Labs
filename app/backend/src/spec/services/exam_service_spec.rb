@@ -7,7 +7,7 @@ describe ExamService do
   let(:data_builder) { class_double(ExamDataBuilder) }
   let(:exam_service) { ExamService.new(data_builder) }
 
-  context '#get_exams' do
+  describe '#get_exams' do
     it 'returns an empty array when there are no exams' do
       allow(data_builder).to receive(:get_exams_from_db).and_return([])
 
@@ -16,9 +16,9 @@ describe ExamService do
 
     it 'returns grouped exams when there are exams in DB' do
       allow(data_builder).to receive(:get_exams_from_db).and_return(db_result)
-      allow(data_builder).to receive(:build_exam_data).and_return(*api_response)
+      allow(data_builder).to receive(:build_exam_data).and_return(*api_response_all['results'])
 
-      expect(exam_service.get_exams).to eq(api_response)
+      expect(exam_service.get_exams).to eq(api_response_all['results'])
     end
   end
 end

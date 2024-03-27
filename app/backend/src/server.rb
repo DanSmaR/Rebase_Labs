@@ -8,62 +8,41 @@ require_relative './services/exam_service.rb'
 require_relative './jobs/csv_import_job.rb'
 require_relative './middleware/pagination_middleware.rb'
 
-use PaginationMiddleware
+use PaginationMiddleware, ExamModel, ExamService.new(ExamDataBuilder)
 
 get '/tests' do
   content_type :json
   response.headers['Access-Control-Allow-Origin'] = '*'
 
-  begin
-    results = env['results']
+  results = env['results']
 
-    unless results.any?
-      status 404
-      return {
-        "previous" => nil,
-        "next" => nil,
-        "results" => results
-    }.to_json
-    end
-
-    exams = results.group_by { |item| item['token'] }.map do |token, items|
-      ExamDataBuilder.build_exam_data(items)
-    end
-
-    response = {
-      previous: env['previous'],
-      next: env['next'],
-      results: exams
-    }
-
-    response.to_json
-  rescue PG::Error => e
-    status 500
-    { error: true,  message: 'An error has occurred. Try again' }.to_json
+  unless results.any?
+    status 404
+    return { total_pages: 0, previous: nil, next: nil, results: }.to_json
   end
+
+  response = {
+    total_pages: env['total_pages'],
+    previous: env['previous'],
+    next: env['next'],
+    results:
+  }
+
+  response.to_json
 end
 
 get '/tests/:token' do
   content_type :json
   response.headers['Access-Control-Allow-Origin'] = '*'
 
-  begin
-    results = env['results']
+  results = env['results']
 
-    unless results.any?
-      status 404
-      return results.to_json
-    end
-
-    response = results.group_by { |item| item['token'] }.map do |token, items|
-      ExamDataBuilder.build_exam_data(items)
-    end
-
-    response.to_json
-  rescue PG::Error => e
-    status 500
-    { error: true,  message: 'An error has occurred. Try again' }.to_json
+  unless results.any?
+    status 404
+    return results.to_json
   end
+
+  results.to_json
 end
 
 post '/import' do

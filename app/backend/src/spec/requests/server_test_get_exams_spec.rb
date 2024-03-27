@@ -21,7 +21,7 @@ RSpec.describe 'Server' do
 
       data = JSON.parse(response.body)
 
-      expect(data).to eq(api_response)
+      expect(data).to eq(api_response_all)
     end
 
     context "when the result is empty" do
@@ -33,11 +33,7 @@ RSpec.describe 'Server' do
         data = JSON.parse(response.body)
 
         expect(response.status).to eq 404
-        expect(data).to eq({
-          "previous" => nil,
-          "next" => nil,
-          "results" => []
-        })
+        expect(data).to eq({"next"=>nil, "previous"=>nil, "results"=>[], "total_pages"=>0})
       end
     end
 
@@ -49,7 +45,7 @@ RSpec.describe 'Server' do
 
         data = JSON.parse(response.body)
 
-        expect(data).to eq([api_response['results'][0]])
+        expect(data).to eq([api_response_by_token[2]])
       end
     end
 
