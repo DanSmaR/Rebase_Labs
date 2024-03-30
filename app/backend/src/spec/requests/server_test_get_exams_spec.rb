@@ -2,8 +2,7 @@ require 'json'
 require 'pg'
 require_relative '../spec_helper.rb'
 require_relative '../support/test_data.rb'
-require_relative '../../database/db_manager.rb'
-require_relative '../../database/database_setup.rb'
+Dir[File.expand_path("../../database/*.rb", __dir__)].each { |file| require file }
 
 RSpec.describe 'Server' do
   describe 'GET /tests' do
@@ -21,8 +20,7 @@ RSpec.describe 'Server' do
 
       data = JSON.parse(response.body)
 
-      expect(data).to be_instance_of Array
-      expect(data).to eq(api_response)
+      expect(data).to eq(api_response_all)
     end
 
     context "when the result is empty" do
@@ -34,7 +32,7 @@ RSpec.describe 'Server' do
         data = JSON.parse(response.body)
 
         expect(response.status).to eq 404
-        expect(data).to eq []
+        expect(data).to eq({"next"=>nil, "previous"=>nil, "results"=>[], "total_pages"=>0})
       end
     end
 
@@ -46,8 +44,7 @@ RSpec.describe 'Server' do
 
         data = JSON.parse(response.body)
 
-        expect(data).to be_instance_of Array
-        expect(data).to eq([api_response[0]])
+        expect(data).to eq([api_response_by_token[2]])
       end
     end
 

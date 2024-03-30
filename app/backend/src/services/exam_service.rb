@@ -3,8 +3,8 @@ class ExamService
     @data_builder = data_builder
   end
 
-  def get_exams(token = nil)
-    exams = @data_builder.get_exams_from_db(token)
+  def get_exams(token: '', limit: nil, offset: nil)
+    exams = @data_builder.get_exams_from_db(token:, limit:, offset:)
 
     return [] unless exams.any?
 

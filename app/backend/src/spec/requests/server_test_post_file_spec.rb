@@ -1,8 +1,7 @@
 require 'json'
 require 'fileutils'
 require_relative '../spec_helper.rb'
-require_relative '../../database/database_setup.rb'
-require_relative '../../database/db_manager.rb'
+Dir[File.expand_path("../../database/*.rb", __dir__)].each { |file| require file }
 
 RSpec.describe 'Server' do
   describe 'POST /import' do
