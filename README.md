@@ -16,6 +16,7 @@ The exams are paginated and can be filtered by token. The application also allow
 - [Accessing the Database](#accessing-the-database)
 - [View container logs](#view-container-logs)
 - [Running the Tests](#running-the-tests)
+- [Importing CSV file manually](#importing-csv-file-manually)
 - [API](#api)
   - [All exams](#all-exams)
     - [GET /tests](#get-tests)
@@ -156,6 +157,11 @@ To access the API backend container, run:
 ```sh
 docker exec -it medical_exams_backend bash
 ```
+or
+
+```sh
+bin/dev backend_bash
+```
 
 To access the App frontend container, run:
 
@@ -191,6 +197,20 @@ To run the tests, you need to access the specific containers as described above.
 
 ```sh
 cd src && bundle exec rspec
+```
+
+## Importing csv file manually
+
+To import a csv file manually, you need to access the API backend containeras described above:
+
+```sh
+bin/dev backend_bash
+```
+
+Then, run the following command inside the container terminal:
+
+```sh
+cd src && ruby import_from_csv.rb
 ```
 
 # API
