@@ -254,31 +254,31 @@ This will return a JSON object with the medical exam data for the token `IQCZ17`
 ```json
 [
   {
-    "token"=>"IQCZ17",
-    "exam_date"=>"2021-08-05",
-    "cpf"=>"048.973.170-88",
-    "name"=>"Emilly Batista Neto",
-    "email"=>"gerald.crona@ebert-quigley.com",
-    "birthday"=>"2001-03-11",
-    "address"=>"165 Rua Rafaela",
-    "city"=>"Ituverava",
-    "state"=>"Alagoas",
-    "doctor"=>{
-      "crm"=>"B000BJ20J4",
-      "crm_state"=>"PI",
-      "name"=>"Maria Luiza Pires",
-      "email"=>"denna@wisozk.biz"
+    "token": "IQCZ17",
+    "exam_date": "2021-08-05",
+    "cpf": "048.973.170-88",
+    "name": "Emilly Batista Neto",
+    "email": "gerald.crona@ebert-quigley.com",
+    "birthday": "2001-03-11",
+    "address": "165 Rua Rafaela",
+    "city": "Ituverava",
+    "state": "Alagoas",
+    "doctor": {
+      "crm": "B000BJ20J4",
+      "crm_state": "PI",
+      "name": "Maria Luiza Pires",
+      "email": "denna@wisozk.biz"
     },
-    "tests"=>[
+    "tests": [
       {
-        "type"=>"hemácias",
-        "limits"=>"45-52",
-        "result"=>"97"
+        "type": "hemácias",
+        "limits": "45-52",
+        "result": "97"
       },
       {
-        "type"=>"leucócitos",
-        "limits"=>"9-61",
-        "result"=>"89"
+        "type": "leucócitos",
+        "limits": "9-61",
+        "result": "89"
       },
       // rest of the tests
     ]
@@ -305,13 +305,13 @@ curl -X POST -F "file=@/path/to/your/file.csv" http://localhost:3001/tests/impor
 This will return a JSON object with the message `File imported successfully` and **STATUS CODE = 200**
 
 ```json
-{ success: true, message: 'Data imported successfully' }
+{ "success": true, "message": "Data imported successfully" }
 ```
 
 And returns an error message if the file is not a csv file and **STATUS CODE = 400**
 
 ```json
-{ success: false, message: 'Invalid file type. Please, upload a csv file' }
+{ "success": false, "message": "Invalid file type. Please, upload a csv file" }
 ```
 
 ## Server Errors
@@ -319,5 +319,5 @@ And returns an error message if the file is not a csv file and **STATUS CODE = 4
 If the server encounters an error, it will return a JSON object with the error message and **STATUS CODE = 500**
 
 ```json
-{ error: true,  message: 'An error has occurred. Try again' }
+{ "error": true,  "message": "An error has occurred. Try again" }
 ```
