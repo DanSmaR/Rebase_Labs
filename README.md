@@ -28,8 +28,6 @@ The exams are paginated and can be filtered by token. The application also allow
 
 ## Technologies
 
-## Technologies
-
 ![Ruby](https://img.shields.io/badge/-Ruby-red?logo=ruby&logoColor=white) ![Sinatra](https://img.shields.io/badge/-Sinatra-black?logo=sinatra&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-blue?logo=postgresql&logoColor=white) ![Sidekiq](https://img.shields.io/badge/-Sidekiq-green?logo=sidekiq&logoColor=white) ![Redis](https://img.shields.io/badge/-Redis-red?logo=redis&logoColor=white) ![Docker](https://img.shields.io/badge/-Docker-blue?logo=docker&logoColor=white) ![Docker Compose](https://img.shields.io/badge/-Docker%20Compose-blue?logo=docker&logoColor=white) ![RSpec](https://img.shields.io/badge/-RSpec-red?logo=ruby&logoColor=white) ![JavaScript](https://img.shields.io/badge/-JavaScript-yellow?logo=javascript&logoColor=white) ![HTML](https://img.shields.io/badge/-HTML-orange?logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/-CSS-blue?logo=css3&logoColor=white) ![Bootstrap](https://img.shields.io/badge/-Bootstrap-purple?logo=bootstrap&logoColor=white)
 
 ## Page Screenshots
