@@ -11,9 +11,9 @@ class DatabaseSetup
   )
   MODELS = [PatientModel, DoctorModel, ExamModel, TestModel]
 
-  def self.seed(conn)
+  def self.seed(conn, file_path = CSV_FILE_PATH)
     prepare_statements(conn)
-    insert_csv_data(CSV_FILE_PATH, conn)
+    insert_csv_data(file_path, conn)
   end
 
   def self.prepare_statements(conn)
