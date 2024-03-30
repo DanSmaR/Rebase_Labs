@@ -2,8 +2,7 @@ require 'json'
 require 'pg'
 require_relative '../spec_helper.rb'
 require_relative '../support/test_data.rb'
-require_relative '../../database/db_manager.rb'
-require_relative '../../database/database_setup.rb'
+Dir[File.expand_path("../../database/*.rb", __dir__)].each { |file| require file }
 
 RSpec.describe 'Server' do
   describe 'GET /tests' do

@@ -1,7 +1,6 @@
 require_relative '../spec_helper.rb'
 require_relative '../../jobs/csv_import_job.rb'
-require_relative '../../database/database_setup.rb'
-require_relative '../../database/db_manager.rb'
+Dir[File.expand_path("../../database/*.rb", __dir__)].each { |file| require file }
 require_relative '../../exam_data_builder.rb'
 require_relative '../support/test_data.rb'
 
