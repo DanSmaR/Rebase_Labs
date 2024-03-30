@@ -23,7 +23,15 @@ const navigateTo = url => {
   router();
 };
 
-const router = () => {
+export const updateHTML = html => {
+  const app = document.querySelector("#app");
+  while (app.firstChild) {
+    app.removeChild(app.firstChild);
+  }
+  app.appendChild(html);
+};
+
+export const router = () => {
   notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
   notice.innerText = '';
 
@@ -53,13 +61,7 @@ const router = () => {
   const view = new match.route.view(getParams(match));
   
   view.getHtml()
-    .then(html => {
-      const app = document.querySelector("#app");
-      while (app.firstChild) {
-        app.removeChild(app.firstChild);
-      }
-      app.appendChild(html);
-    })
+    .then(updateHTML)
 };
 
 window.addEventListener('popstate', router);

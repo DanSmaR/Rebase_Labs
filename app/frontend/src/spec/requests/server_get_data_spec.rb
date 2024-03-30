@@ -1,96 +1,113 @@
 require_relative '../spec_helper.rb'
 require_relative '../support/test_data.rb'
-require_relative '../../services/api_service.rb'
 require 'json'
-require 'faraday'
 
-RSpec.describe 'Server' do
+describe 'GET /data' do
+
   def app
     Sinatra::Application
   end
 
-  describe 'GET /data' do
-    let(:mock_conn) { instance_double(Faraday::Connection) }
-    let(:mock_response) { instance_double(Faraday::Response) }
+  let(:api_service) { instance_double(ApiService) }
+  let(:exam_service) { ExamService.new(api_service) }
 
-    before do
-      allow(ApiService).to receive(:connection).and_return(mock_conn)
-    end
+  before do
+    allow(ApiService).to receive(:new).and_return(api_service)
+    allow(ExamService).to receive(:new).and_return(exam_service)
+  end
 
-    after do
-      ApiService.instance_variable_set(:@conn, nil)
-    end
+  context "?page=1&limit=2" do
+    let(:page) { 1 }
+    let(:limit) { 2 }
+    let(:api_response) {  api_response_page_1.to_json}
 
-    it 'returns the exams data' do
-      api_response_json = api_response.to_json
+    it 'returns the first exams page' do
+      allow(api_service).to receive(:get_exams).with(page:, limit:).and_return(api_response)
 
-      allow(ApiService).to receive(:get_exams).with(mock_conn).and_return(mock_response)
-      allow(mock_response).to receive(:body).and_return(api_response_json)
-      allow(mock_response).to receive(:status).and_return(200)
-
-      response = get '/data'
+      response = get "/data?page=#{page}&limit=#{limit}"
 
       data = JSON.parse(response.body)
 
       expect(response.status).to eq 200
-      expect(data).to be_instance_of Array
-      expect(data).to eq(JSON.parse(api_response_json))
+      expect(data).to eq(JSON.parse(api_response))
     end
 
-    context 'with token params' do
-      it 'returns the specific exams data' do
-        api_response_json = [api_response[0]].to_json
-        token = 'IQCZ17'
+    it 'returns empty results when there is no exams' do
+      empty_api_response = [].to_json
 
-        allow(ApiService).to receive(:get_exam_by_token).with(mock_conn, token).and_return(mock_response)
-        allow(mock_response).to receive(:body).and_return(api_response_json)
-        allow(mock_response).to receive(:status).and_return(200)
+      allow(api_service)
+        .to receive(:get_exams)
+        .with(page:, limit:)
+        .and_raise(ApiNotFoundError.new('Server Error', empty_api_response))
 
-        response = get "/data?token=#{token}"
+      response = get "/data?page=#{page}&limit=#{limit}"
 
-        data = JSON.parse(response.body)
+      data = JSON.parse(response.body)
 
-        expect(response.status).to eq 200
-        expect(data).to be_instance_of Array
-        expect(data).to eq(JSON.parse(api_response_json))
-      end
+      expect(response.status).to eq 404
+      expect(data).to eq(JSON.parse(empty_api_response))
+    end
+  end
+
+  context 'with token params' do
+    let(:api_response) { api_response_by_token.to_json }
+    let(:token) { 'IQCZ17' }
+
+    it 'returns the specific exams data' do
+
+      allow(api_service).to receive(:get_exam_by_token).with(token).and_return(api_response)
+
+      response = get "/data?token=#{token}"
+
+      data = JSON.parse(response.body)
+
+      expect(response.status).to eq 200
+      expect(data).to eq(JSON.parse(api_response))
+    end
+  end
+
+  context "with unregistered token" do
+    let(:api_response) { [].to_json }
+    let(:token) { 'foo' }
+    it "returns an empty array" do
+
+      allow(api_service)
+        .to receive(:get_exam_by_token)
+        .with(token)
+        .and_raise(ApiNotFoundError.new('Server Error', api_response))
+
+      response = get "/data?token=#{token}"
+
+      data = JSON.parse(response.body)
+
+      expect(response.status).to eq 404
+      expect(data).to eq(JSON.parse(api_response))
+    end
+  end
+
+  context "when occurs server error" do
+    let(:api_response) { { error: true,  message: 'An error has occurred. Try again' }.to_json }
+
+    it "returns an error message at /data?page=1 endpoint" do
+      allow(api_service).to receive(:get_exams).and_raise(ApiServerError, 'Server Error')
+
+      response = get '/data?page=1'
+
+      data = JSON.parse(response.body)
+
+      expect(response.status).to eq 500
+      expect(data).to eq(JSON.parse(api_response))
     end
 
-    context "with unregistered token" do
-      it "returns an empty array" do
-        api_response_json = [].to_json
-        token = 'blabla'
+    it "returns an error message at /data?token=ST7APU endpoint" do
+      allow(api_service).to receive(:get_exam_by_token).and_raise(ApiServerError, 'Server Error')
 
-        allow(ApiService).to receive(:get_exam_by_token).with(mock_conn, token).and_return(mock_response)
-        allow(mock_response).to receive(:body).and_return(api_response_json)
-        allow(mock_response).to receive(:status).and_return(200)
+      response = get '/data?token=ST7APU'
 
-        response = get "/data?token=#{token}"
+      data = JSON.parse(response.body)
 
-        data = JSON.parse(response.body)
-
-        expect(response.status).to eq 200
-        expect(data).to be_instance_of Array
-        expect(data).to eq(JSON.parse(api_response_json))
-      end
+      expect(response.status).to eq 500
+      expect(data).to eq(JSON.parse(api_response))
     end
-
-    context "when occurs server error" do
-      it "returns an error message at /data endpoint" do
-        api_response_json = { error: true,  message: 'An error has occurred. Try again' }.to_json
-
-        allow(ApiService).to receive(:get_exams).and_raise(Faraday::ServerError)
-        allow(mock_response).to receive(:body).and_return(api_response_json)
-        allow(mock_response).to receive(:status).and_return(500)
-
-        response = get '/data'
-
-        data = JSON.parse(response.body)
-
-        expect(response.status).to eq 500
-        expect(data).to eq(JSON.parse(api_response_json))
-      end
-    end
-
   end
 end
