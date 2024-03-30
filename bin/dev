@@ -28,6 +28,10 @@ logs() {
   cd app && docker compose logs -f && cd ..
 }
 
+backend_bash() {
+  cd app && docker compose exec backend bash && cd ..
+}
+
 case $1 in
     up)
         up
@@ -47,7 +51,10 @@ case $1 in
     logs)
         logs
         ;;
+    backend_bash)
+        backend_bash
+        ;;
     *)
-        echo "Usage: bin/dev {up|down|start|stop|rebuild|logs}"
+        echo "Usage: bin/dev {up|down|start|stop|rebuild|logs|backend_bash}"
         ;;
 esac
