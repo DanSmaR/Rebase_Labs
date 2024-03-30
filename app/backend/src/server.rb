@@ -6,44 +6,48 @@ require_relative './database/database_setup.rb'
 require_relative './exam_data_builder.rb'
 require_relative './services/exam_service.rb'
 require_relative './jobs/csv_import_job.rb'
-require_relative './errors/database_error.rb'
+require_relative './middleware/pagination_middleware.rb'
 
-exam_service = ExamService.new(ExamDataBuilder)
+use PaginationMiddleware, ExamModel, ExamService.new(ExamDataBuilder)
 
 get '/tests' do
   content_type :json
   response.headers['Access-Control-Allow-Origin'] = '*'
 
-  begin
-    results = exam_service.get_exams
+  results = env['results']
 
-    status results.any? ? 200 : 404
-    results.to_json
-
-  rescue DataBaseError => e
-    status 500
-    { error: true,  message: 'An error has occurred. Try again' }.to_json
+  unless results.any?
+    status 404
+    return { total_pages: 0, previous: nil, next: nil, results: }.to_json
   end
+
+  response = {
+    total_pages: env['total_pages'],
+    previous: env['previous'],
+    next: env['next'],
+    results:
+  }
+
+  response.to_json
 end
 
 get '/tests/:token' do
   content_type :json
   response.headers['Access-Control-Allow-Origin'] = '*'
 
-  begin
-    results = exam_service.get_exams(params[:token])
+  results = env['results']
 
-    status results.any? ? 200 : 404
-    results.to_json
-
-  rescue
-    status 500
-    { error: true,  message: 'An error has occurred. Try again' }.to_json
+  unless results.any?
+    status 404
+    return results.to_json
   end
+
+  results.to_json
 end
 
 post '/import' do
   content_type :json
+  response.headers['Access-Control-Allow-Origin'] = '*'
 
   begin
     if params[:file] && (tempfile = params[:file][:tempfile])

@@ -7,6 +7,8 @@ class TestModel < BaseModel
     ON CONFLICT (exam_token, exam_type) DO NOTHING
   SQL
 
+  COUNT_STATEMENT = "SELECT COUNT(id) FROM tests;"
+
   def self.prepare_data(data)
     [
       data['token resultado exame'],

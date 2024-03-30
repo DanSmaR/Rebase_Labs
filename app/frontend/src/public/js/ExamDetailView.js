@@ -30,7 +30,6 @@ export default class extends AbstractView {
         })
         .catch((error) => {
           console.error(error);
-          notice.classList.remove('alert', 'alert-warning', 'alert-success', 'alert-danger');
           notice.classList.add('alert', 'alert-danger');
           notice.innerText = 'Não foi possível completar sua ação. Tente novamente';
         })

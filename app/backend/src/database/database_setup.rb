@@ -1,10 +1,9 @@
 require 'csv'
 require 'pg'
 require_relative './db_manager.rb'
-require_relative '../models/patient_model.rb'
-require_relative '../models/doctor_model.rb'
-require_relative '../models/exam_model.rb'
-require_relative '../models/test_model.rb'
+Dir[File.expand_path("../models/*.rb", __dir__)]
+  .reject { |file| file.include? "base_model" }
+  .each { |file| require file }
 
 class DatabaseSetup
   CSV_FILE_PATH = File.expand_path(

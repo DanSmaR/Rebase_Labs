@@ -1,8 +1,8 @@
 require 'rack/handler/puma'
 require 'sinatra'
 require 'faraday'
-require_relative './services/upload_csv_service.rb'
-require_relative './services/api_service.rb'
+Dir[File.expand_path("./services/*.rb", __dir__)].each { |file| require file }
+Dir[File.expand_path("./errors/*.rb", __dir__)].each { |file| require file }
 
 get '/' do
   erb :index
@@ -29,25 +29,22 @@ get '/data' do
   content_type :json
 
   begin
-    conn = ApiService.connection
+    page = params[:page] ? params[:page].to_i : 1
+    limit = params[:limit] ? params[:limit].to_i : 20
 
-    if params[:token]
-      response = ApiService.get_exam_by_token(conn, params[:token])
-    else
-      response = ApiService.get_exams(conn)
-    end
+    exam_service = ExamService.new(ApiService.new)
+    exam_service.fetch_data(page, limit, params[:token])
 
-    response.body
-
-  rescue Faraday::ResourceNotFound => e
+  rescue ApiNotFoundError => e
     puts '------------- Frontend Error GET /data ---------------'
-    puts e
+    puts e.message
 
     status 404
-    return [].to_json
-  rescue Faraday::ServerError, Faraday::Connection, Faraday::ConnectionFailed => e
+    return e.payload
+
+  rescue ApiServerError => e
     puts '------------- Frontend Error GET /data ---------------'
-    puts e
+    puts e.message
 
     status 500
     return { error: true,  message: 'An error has occurred. Try again' }.to_json
@@ -67,22 +64,21 @@ post '/upload' do
   end
 
   begin
-    conn = ApiService.connection
-
     payload = UploadCSVService.create_payload(validation_result[:tmpfile])
 
-    ApiService.send_file(conn, payload)
+    exam_service = ExamService.new(ApiService.new)
+    exam_service.send_file(payload)
 
     status 200
     { success: true, message: 'Data imported successfully' }.to_json
 
-  rescue Faraday::ServerError, Faraday::Connection, Faraday::ConnectionFailed => e
+  rescue ApiServerError => e
     puts e
 
     status 500
     return { error: true,  message: 'An error has occurred. Try again' }.to_json
 
-  rescue Faraday::BadRequestError => e
+  rescue ApiBadRequestError => e
     puts e
 
     status 400

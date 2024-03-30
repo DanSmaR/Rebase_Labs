@@ -1,6 +1,5 @@
 require 'sidekiq'
-require_relative '../database/database_setup.rb'
-require_relative '../database/db_manager.rb'
+Dir[File.expand_path("../database/*.rb", __dir__)].each { |file| require file }
 
 class CSVImportJob
   include Sidekiq::Job
