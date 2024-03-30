@@ -25,11 +25,8 @@ get '/search' do
 end
 
 # This route is used to get the data from the backend
-
-
 get '/data' do
   content_type :json
-
 
   begin
     page = params[:page] ? params[:page].to_i : 1

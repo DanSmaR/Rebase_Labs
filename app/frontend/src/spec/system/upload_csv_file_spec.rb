@@ -1,25 +1,18 @@
 require_relative '../spec_helper.rb'
-require 'faraday'
-require 'faraday/multipart'
 
-RSpec.describe 'User sends csv file', type: :feature, js: true do
-  let(:mock_file_part) { double('Faraday::Multipart::FilePart') }
+describe 'User sends csv file', type: :feature, js: true do
+  let(:mock_payload) { { file: double('Multipart::Post::UploadIO') } }
+  let(:api_service) { instance_double(ApiService) }
+  let(:exam_service) { ExamService.new(api_service) }
 
   before do
-    allow(Faraday::Multipart::FilePart).to receive(:new).with(any_args).and_return(mock_file_part)
-  end
-
-  after do
-    ApiService.instance_variable_set(:@conn, nil)
+    allow(ApiService).to receive(:new).and_return(api_service)
+    allow(ExamService).to receive(:new).and_return(exam_service)
+    allow(UploadCSVService).to receive(:create_payload).and_return(mock_payload)
   end
 
   it 'and sees a successful message' do
-    mock_conn = instance_double(Faraday::Connection)
-    mock_response = instance_double(Faraday::Response)
-
-    allow(ApiService).to receive(:connection).and_return(mock_conn)
-    allow(ApiService).to receive(:send_file).with(mock_conn, { :file => mock_file_part }).and_return(mock_response)
-    allow(mock_response).to receive(:status).and_return(200)
+    allow(api_service).to receive(:send_file).with(mock_payload)
 
     visit '/'
 
@@ -58,9 +51,7 @@ RSpec.describe 'User sends csv file', type: :feature, js: true do
 
   context "when an error occurs in the server" do
     it 'and sees an error message' do
-      mock_conn = instance_double(Faraday::Connection)
-      allow(ApiService).to receive(:connection).and_return(mock_conn)
-      allow(ApiService).to receive(:send_file).and_raise(Faraday::ConnectionFailed)
+      allow(api_service).to receive(:send_file).and_raise(ApiServerError, 'Server Error')
 
       visit '/'
 
@@ -72,6 +63,4 @@ RSpec.describe 'User sends csv file', type: :feature, js: true do
       expect(page).to have_content 'Erro ao enviar arquivo! Tente novamente.'
     end
   end
-
-
 end

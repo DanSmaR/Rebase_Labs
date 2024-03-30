@@ -1,29 +1,26 @@
 require_relative '../spec_helper.rb'
-require 'json'
-require 'faraday'
-require 'faraday/multipart'
-RSpec.describe 'Upload Endpoint' do
+
+describe 'Upload Endpoint' do
   def app
     Sinatra::Application
   end
+
   describe 'POST /upload' do
-    let(:mock_conn) { instance_double(Faraday::Connection) }
-    let(:mock_response) { instance_double(Faraday::Response) }
     let(:file_path) { File.expand_path('../support/data.csv', __dir__) }
     let(:uploaded_file) { Rack::Test::UploadedFile.new(file_path, 'text/csv') }
-    let(:mock_file_part) { double('Faraday::Multipart::FilePart') }
+    let(:mock_payload) { { file: double('Multipart::Post::UploadIO') } }
+
+    let(:api_service) { instance_double(ApiService) }
+    let(:exam_service) { ExamService.new(api_service) }
 
     before do
-      allow(ApiService).to receive(:connection).and_return(mock_conn)
-      allow(Faraday::Multipart::FilePart).to receive(:new).with(any_args).and_return(mock_file_part)
-    end
-
-    after do
-      ApiService.instance_variable_set(:@conn, nil)
+      allow(ApiService).to receive(:new).and_return(api_service)
+      allow(ExamService).to receive(:new).and_return(exam_service)
+      allow(UploadCSVService).to receive(:create_payload).and_return(mock_payload)
     end
 
     it 'returns 200 when a file is uploaded' do
-      allow(ApiService).to receive(:send_file).with(mock_conn, { :file => mock_file_part }).and_return(mock_response)
+      allow(api_service).to receive(:send_file).with(mock_payload)
 
       post '/upload', csvFile: uploaded_file
 
@@ -39,12 +36,12 @@ RSpec.describe 'Upload Endpoint' do
     end
 
     context "when a no csv file type is uploaded" do
-      let(:file_path) { File.expand_path('../support/test_data.rb', __dir__) }
-      let(:uploaded_file) { Rack::Test::UploadedFile.new(file_path, 'text/csv') }
+      let(:wrong_file_path) { File.expand_path('../support/test_data.rb', __dir__) }
+      let(:wrong_file) { Rack::Test::UploadedFile.new(wrong_file_path, 'text/csv') }
 
       it 'returns 400 and error message' do
 
-        post '/upload', csvFile: uploaded_file
+        post '/upload', csvFile: wrong_file
 
         expect(last_response.status).to eq 400
         expect(JSON.parse(last_response.body)).to eq({"message"=>"Invalid file format", "success"=>false})
@@ -53,7 +50,7 @@ RSpec.describe 'Upload Endpoint' do
 
     context 'server error' do
       it 'returns 500 when an error occurs during import' do
-        allow(ApiService).to receive(:send_file).with(mock_conn, { :file => mock_file_part }).and_raise(Faraday::ServerError)
+        allow(api_service).to receive(:send_file).and_raise(ApiServerError, 'Server Error')
 
         post '/upload', csvFile: uploaded_file
 

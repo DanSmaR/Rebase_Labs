@@ -1,100 +1,136 @@
 require_relative '../spec_helper.rb'
 require_relative '../support/test_data.rb'
-require 'faraday'
-require 'json'
 
-RSpec.describe 'User visits search page', type: :feature, js: true do
+describe 'User visits search page', type: :feature, js: true do
+  let(:api_service) { instance_double(ApiService) }
+  let(:exam_service) { ExamService.new(api_service) }
+  let(:token) { 'ST7APU' }
 
-  after do
-    ApiService.instance_variable_set(:@conn, nil)
+  before do
+    allow(ApiService).to receive(:new).and_return(api_service)
+    allow(ExamService).to receive(:new).and_return(exam_service)
   end
 
-  it 'and search for a exam by token successfully' do
-    conn = instance_double(Faraday::Connection)
-    allow(Faraday).to receive(:new).and_return(conn)
-    allow(conn).to receive(:get).with('tests/IQCZ17').and_return(double(body: [api_response[0]].to_json))
+  context "When there is a token" do
+    it 'finds a exam successfully' do
+      allow(api_service).to receive(:get_exams).with(page: 1, limit:20).and_return(api_response_page_1.to_json)
+      allow(api_service).to receive(:get_exam_by_token).with(token).and_return(api_response_by_token.to_json)
 
-    visit '/'
-    click_link 'Busca por Token'
+      visit '/'
+      click_link 'Busca por Token'
 
-    within 'header' do
-      expect(page).to have_link 'Início', href: '/'
-      expect(page).to have_link 'Exames', href: '/exams'
-      expect(page).to have_link 'Busca por Token', href: '/search'
+      within 'header' do
+        expect(page).to have_link 'Início', href: '/'
+        expect(page).to have_link 'Exames', href: '/exams'
+        expect(page).to have_link 'Busca por Token', href: '/search'
 
-      expect(page).to have_field 'csvFile', type: 'file'
-      expect(page).to have_button 'Enviar CSV'
+        expect(page).to have_field 'csvFile', type: 'file'
+        expect(page).to have_button 'Enviar CSV'
+      end
+
+      expect(page).to have_current_path('/search')
+      expect(page).to have_content('Busca de Exames por Token')
+
+      fill_in 'token', with: token
+      click_button 'Pesquisar'
+
+      expect(page).to have_content 'Detalhe Exame Médico'
+      expect(page).to have_content "Exame #{token} feito em 24/03/2022"
+
+      expect(page).to have_content('CPF')
+      expect(page).to have_content('Nome')
+      expect(page).to have_content('E-mail')
+      expect(page).to have_content('Data de Nascimento')
+      expect(page).to have_content('Endereço')
+      expect(page).to have_content('Estado')
+      expect(page).to have_content('Médico')
+      expect(page).to have_content('E-mail do Médico')
+      expect(page).to have_content('CRM do Médico')
+      expect(page).to have_content('CRM Estado')
+      expect(page).to have_content('Tipo de Exame')
+      expect(page).to have_content('Limites')
+      expect(page).to have_content('Resultado')
+
+      expect(page).to have_content('089.034.562-70')
+      expect(page).to have_content('Patricia Gentil')
+      expect(page).to have_content('herta_wehner@krajcik.name')
+      expect(page).to have_content('1998-02-25')
+      expect(page).to have_content('5334 Rodovia Thiago Bittencourt')
+      expect(page).to have_content('Paraná')
+      expect(page).to have_content('Félix Garcês')
+      expect(page).to have_content('letty_greenfelder@herzog.name')
+      expect(page).to have_content('B00067668W')
+      expect(page).to have_content('RS')
+      expect(page).to have_content('hemácias', count: 1)
+      expect(page).to have_content('45-52')
+      expect(page).to have_content('81')
+      expect(page).to have_content('leucócitos', count: 1)
+      expect(page).to have_content('9-61')
+      expect(page).to have_content('66')
+      expect(page).to have_content('plaquetas', count: 1)
+      expect(page).to have_content('11-93')
+      expect(page).to have_content('68')
+      expect(page).to have_content('hdl', count: 1)
+      expect(page).to have_content('19-75')
+      expect(page).to have_content('49')
+      expect(page).to have_content('ldl', count: 2)
+      expect(page).to have_content('45-54')
+      expect(page).to have_content('24')
+      expect(page).to have_content('vldl', count: 1)
+      expect(page).to have_content('48-72')
+      expect(page).to have_content('36')
+      expect(page).to have_content('glicemia', count: 1)
+      expect(page).to have_content('25-83')
+      expect(page).to have_content('86')
+      expect(page).to have_content('tgo', count: 1)
+      expect(page).to have_content('50-84')
+      expect(page).to have_content('35')
+      expect(page).to have_content('tgp', count: 1)
+      expect(page).to have_content('38-63')
+      expect(page).to have_content('99')
+      expect(page).to have_content('eletrólitos', count: 1)
+      expect(page).to have_content('2-68')
+      expect(page).to have_content('19')
+      expect(page).to have_content('tsh', count: 1)
+      expect(page).to have_content('25-80')
+      expect(page).to have_content('95')
+      expect(page).to have_content('t4-livre', count: 1)
+      expect(page).to have_content('34-60')
+      expect(page).to have_content('39')
+      expect(page).to have_content('ácido úrico', count: 1)
+      expect(page).to have_content('15-61')
+      expect(page).to have_content('62')
+
+      expect(page).to_not have_content('NIG0TP')
+      expect(page).to_not have_content('052.041.078-51')
+      expect(page).to_not have_content('Sra. Meire da Terra')
+      expect(page).to_not have_content('lavinia@bartoletti.co')
+      expect(page).to_not have_content('1968-06-21')
+      expect(page).to_not have_content('230 Rua Eduarda')
+      expect(page).to_not have_content('Rio Fortuna')
+      expect(page).to_not have_content('Maranhão')
+      expect(page).to_not have_content('Maria Helena Ramalho')
+      expect(page).to_not have_content('rayford@kemmer-kunze.info')
+      expect(page).to_not have_content('B0002IQM66')
+      expect(page).to_not have_content('SC')
     end
-
-    expect(page).to have_current_path('/search')
-    expect(page).to have_content('Busca de Exames por Token')
-
-    fill_in 'token', with: 'IQCZ17'
-    click_button 'Pesquisar'
-
-    expect(page).to have_content 'Detalhe Exame Médico'
-    expect(page).to have_content 'Exame IQCZ17 feito em 05/08/2021'
-
-    expect(page).to have_content('CPF')
-    expect(page).to have_content('Nome')
-    expect(page).to have_content('E-mail')
-    expect(page).to have_content('Data de Nascimento')
-    expect(page).to have_content('Endereço')
-    expect(page).to have_content('Estado')
-    expect(page).to have_content('Médico')
-    expect(page).to have_content('E-mail do Médico')
-    expect(page).to have_content('CRM do Médico')
-    expect(page).to have_content('CRM Estado')
-    expect(page).to have_content('Tipo de Exame')
-    expect(page).to have_content('Limites')
-    expect(page).to have_content('Resultado')
-
-    expect(page).to have_content('048.973.170-88')
-    expect(page).to have_content('Emilly Batista Neto')
-    expect(page).to have_content('gerald.crona@ebert-quigley.com')
-    expect(page).to have_content('2001-03-11')
-    expect(page).to have_content('165 Rua Rafaela')
-    expect(page).to have_content('Alagoas')
-    expect(page).to have_content('Maria Luiza Pires')
-    expect(page).to have_content('denna@wisozk.biz')
-    expect(page).to have_content('B000BJ20J4')
-    expect(page).to have_content('PI')
-    expect(page).to have_content('hemácias', count: 1)
-    expect(page).to have_content('45-52')
-    expect(page).to have_content('97')
-    expect(page).to have_content('leucócitos', count: 1)
-    expect(page).to have_content('9-61')
-    expect(page).to have_content('89')
-
-    expect(page).to_not have_content('0W9I67')
-    expect(page).to_not have_content('2021-07-09')
-    expect(page).to_not have_content('048.108.026-04')
-    expect(page).to_not have_content('Juliana dos Reis Filho')
-    expect(page).to_not have_content('mariana_crist@kutch-torp.com')
-    expect(page).to_not have_content('1995-07-03')
-    expect(page).to_not have_content('527 Rodovia Júlio')
-    expect(page).to_not have_content('Lagoa da Canoa')
-    expect(page).to_not have_content('Paraíba')
-    expect(page).to_not have_content('Maria Helena Ramalho')
-    expect(page).to_not have_content('rayford@kemmer-kunze.info')
-    expect(page).to_not have_content('B0002IQM66')
-    expect(page).to_not have_content('SC')
   end
 
-  it 'and sees an error message when the token is not found' do
-    mock_conn = instance_double(Faraday::Connection)
-    mock_response = instance_double(Faraday::Response)
+  context "when there is no token" do
+    let(:bad_token) { 'foo' }
+    it 'sees an error message' do
+      allow(api_service)
+        .to receive(:get_exam_by_token)
+        .with(bad_token)
+        .and_raise(ApiNotFoundError.new('Resource Not Found', [].to_json))
 
-    token = 'foo'
+      visit '/search'
 
-    allow(ApiService).to receive(:connection).and_return(mock_conn)
-    allow(ApiService).to receive(:get_exam_by_token).with(mock_conn, token).and_raise(Faraday::ResourceNotFound)
+      fill_in 'token', with: bad_token
+      click_button 'Pesquisar'
 
-    visit '/search'
-
-    fill_in 'token', with: token
-    click_button 'Pesquisar'
-
-    expect(page).to have_content 'Exame não encontrado.'
+      expect(page).to have_content 'Exame não encontrado.'
+    end
   end
+
 end
