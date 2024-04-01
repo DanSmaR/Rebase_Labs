@@ -1,7 +1,6 @@
 #!/bin/bash
 
 up() {
-  mkdir -p ~/docker_volumes/medical_exams_db
   cd app && docker compose up && cd ..
 }
 

@@ -12,7 +12,7 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - ~/docker_volumes/medical_exams_db:/var/lib/postrgresql/data
+      - postgresDB:/var/lib/postrgresql/data
       - ./backend/src/db_scripts:/docker-entrypoint-initdb.d/
     networks:
       - backend
@@ -31,7 +31,7 @@ services:
         condition: service_healthy
     volumes:
       - ./backend/src:/usr/src/app/backend/src
-      - rubygems:/usr/local/bundle
+      - rubygems_back:/usr/local/bundle
     networks:
       - frontend
       - backend
@@ -67,6 +67,7 @@ services:
       - backend
     volumes:
       - ./frontend/src:/usr/src/app/frontend/src
+      - rubygems_front:/usr/local/bundle
     networks:
       - frontend
     command: ["./wait-for-it.sh", "--strict", "--timeout=60", "backend:3001", "--", "ruby", "src/server.rb"]
@@ -76,5 +77,6 @@ networks:
   backend:
 
 volumes:
-  rubygems:
-  sidekik_rubygems:
+  rubygems_back:
+  rubygems_front:
+  postgresDB:
